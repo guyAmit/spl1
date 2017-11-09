@@ -82,7 +82,12 @@ void Directory::copy(const Directory &rhs ){
     this->setName(rhs.getName());
     this->children = new vector(rhs.children.size());
     for(auto baseFile:rhs.children) {
-        children.push_back(new BaseFile(baseFile));
+        if(File* file= dynamic_cast<File*>(baseFile))
+        children.push_back(new File(baseFile->getName(),baseFile->getSize()));
+        else{
+            Directory directory = dynamic_cast<Directory >(*baseFile);
+            children.push_back(new Directory(directory));
+        }
     }
 
 }
