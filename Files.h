@@ -48,19 +48,12 @@ private:
 
 /**
  *
- * @param file
- * @return true iff there is no file with the same name as the given file
+ * @param name of file
+ * @return iterator to the file with the same name as the given file
  */
-    bool searchFileName(BaseFile *file);
-    /**
-     * delete all the pointers in children
-     */
+    vector<BaseFile *>::iterator searchFileName(string name);
     void clean() const;
-    /**
-     * deep copies this children vector into new vector.
-     * @return a pointer to the new vector
-     */
-    vector<BaseFile*> copy()const;
+    void copy(const Directory &rhs);
 
 public:
     Directory(string name, Directory *parent); // Constructor
@@ -83,12 +76,12 @@ public:
     void sortBySize(); // Sort children by size (not recursively)
 
     vector<BaseFile *> getChildren(); // Return children
-    int getSize(); // Return the size of the directory (recursively)
+    int getSize() ; // Return the size of the directory (recursively)
     string getAbsolutePath();//Return the path from the root to this(recursively)
     virtual ~Directory();
 
+    Directory(const Directory &rhs);//copy constructor
 
-    Directory &operator=(const Directory &rhs);
 };
 
 #endif
