@@ -5,8 +5,7 @@
 #include <vector>
 #include <algorithm>
 
-using std::string;
-using std::vector
+using namespace std;
 
 class BaseFile {
 private:
@@ -54,6 +53,7 @@ private:
     vector<BaseFile *>::iterator searchFileName(string name);
     void clean() const;
     void copy(const Directory &rhs);
+    void steal(Directory &rhs);
 
 public:
     Directory(string name, Directory *parent); // Constructor
@@ -81,6 +81,9 @@ public:
     virtual ~Directory();
 
     Directory(const Directory &rhs);//copy constructor
+    Directory & operator=(const Directory &rhs);
+    Directory(Directory &&rhs);//move constructor
+    Directory &operator=(Directory &&rhs);
 
 };
 
