@@ -51,9 +51,13 @@ private:
  * @return iterator to the file with the same name as the given file
  */
     vector<BaseFile *>::iterator searchFileName(string name);
+
     void clean() const;
+
     void copy(const Directory &rhs);
+
     void steal(Directory &rhs);
+
 
 public:
     Directory(string name, Directory *parent); // Constructor
@@ -76,12 +80,13 @@ public:
     void sortBySize(); // Sort children by size (not recursively)
 
     vector<BaseFile *> getChildren(); // Return children
-    int getSize() ; // Return the size of the directory (recursively)
+    int getSize(); // Return the size of the directory (recursively)
     string getAbsolutePath();//Return the path from the root to this(recursively)
     virtual ~Directory();
 
     Directory(const Directory &rhs);//copy constructor
-    Directory & operator=(const Directory &rhs);
+    Directory &operator=(const Directory &rhs);
+
     Directory(Directory &&rhs);//move constructor
     Directory &operator=(Directory &&rhs);
 
