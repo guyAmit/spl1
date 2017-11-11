@@ -90,25 +90,29 @@ int main(int , char **) {
     }
 
     //add same file check
-    root.addFile(new File("0",3));
-    root.addFile(new File("1",4));
-    extractVals(root.getChildren());
-    if(!comperVec(test,temp)){
-        red++;
-        std::cout<<"you cant add the same file twice in the same directory"<<std::endl;
+    try {
+        root.addFile(new File("0", 3));
+        root.addFile(new File("1", 4));
+        extractVals(root.getChildren());
+        if (!comperVec(test, temp)) {
+            red++;
+            std::cout << "you cant add the same file twice in the same directory" << std::endl;
+        }
     }
+        catch(std::exception){}
+
 
     //creating two directories under root
-    Directory emptyDir("emptyDir",&root);
-    Directory dir1("dir",&root);
-    root.addFile(&dir1);
-    root.addFile(&emptyDir);
+    Directory* emptyDir=new Directory("emptyDir",&root);
+    Directory* dir1=new Directory("dir",&root);
+    root.addFile(emptyDir);
+    root.addFile(dir1);
 
     //adding files to dir1
     for (int i = 0; i <10 ; ++i) {
-        dir1.addFile(new File(std::to_string(i),i));
+        dir1->addFile(new File(std::to_string(i),i));
     }
-    dir1.addFile(new File(std::to_string(10),10));
+    dir1->addFile(new File(std::to_string(10),10));
 
     root.removeFile("1"); //should remove from root and not from dir1
     test={"0","2","3","4","5","6","7","8","9","emptyDir","dir"};
@@ -120,20 +124,20 @@ int main(int , char **) {
 
 
     //sort test
-    dir1.addFile(new File("01",2));
-    dir1.addFile(new File("02",5));
-    dir1.addFile(new File("00",4));
-    dir1.sortByName();
-    test={"00","01","02","2","3","4","5","6","7","8","9","10"};
-    extractVals(dir1.getChildren());
+    dir1->addFile(new File("01",2));
+    dir1->addFile(new File("02",5));
+    dir1->addFile(new File("00",4));
+    dir1->sortByName();
+    test={"0","00","01","02","1","10","2","3","4","5","6","7","8","9"};
+    extractVals(dir1->getChildren());
     if(!comperVec(test,temp)) {
         red++;
         std::cout<<"sort by name does not work"<<std::endl;
     }
 
-    dir1.sortBySize();
-    testInt ={0,2,2,3,4,4,5,5,6,7,8,9,10};
-    extractVals(dir1.getChildren());
+    dir1->sortBySize();
+    testInt ={0,1,2,2,3,4,4,5,5,6,7,8,9,10};
+    extractValsInt(dir1->getChildren());
     if(!comperVec(test,temp)) {
         red++;
         std::cout<<"sort by size does not work"<<std::endl;
@@ -146,41 +150,40 @@ int main(int , char **) {
     /* Testing files and directories from level 2*/
     /*********************************************/
 
-    Directory innerDir("innerDir",&dir1);
-    dir1.addFile(&innerDir);
-    std::string path_inner="/root/dir/innerDir";
+    Directory* innerDir=new Directory("innerDir",dir1);
+    dir1->addFile(innerDir);
+    std::string path_inner="/dir/innerDir";
     //comper innerDir.GetAbsolutePath to path_inner
-    if(innerDir.getAbsolutePath()!=path_inner){
+    if(innerDir->getAbsolutePath()!=path_inner){
         red++;
         std::cout<<"absolute path is not correct"<<std::endl;
     }
 
     //adding new files for remove tests
     for (int i = 1; i <11 ; ++i) {
-        innerDir.addFile(new File(std::to_string(i),i*20));
+        innerDir->addFile(new File(std::to_string(i),i*20));
     }
 
-    //remove from dapth 2
+    //remove from depth 2
     root.removeFile("20");
     test={"10","30","40","50","60","70","80","90","100"};
-    extractVals(innerDir.getChildren());
+    extractVals(innerDir->getChildren());
     if(!comperVec(test,temp)){
         red++;
-        std::cout<<"remove at depth 2 did not soccseed";
+        std::cout<<"remove at depth 2 did not succeed"<<std::endl;
     }
 
-    //remove from deph 1
-    dir1.removeFile("30");
+    //remove from depth 1
+    dir1->removeFile("30");
     test={"10","40","50","60","70","80","90","100"};
-    extractVals(dir1.getChildren());
+    extractVals(dir1->getChildren());
     if(!comperVec(test,temp)){
         red++;
-        std::cout<<"remove at depth 1 did not soccseed";
+        std::cout<<"remove at depth 1 did not succeed"<<std::endl;
     }
 
 
     std::cout<<"END of level 2 checks, please do not continue if there where errors"<<std::endl;
 
     std::cout << "the number of red test is:"<<red<<std::endl;
-
 }

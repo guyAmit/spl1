@@ -13,11 +13,11 @@ FileSystem::FileSystem() {
 }
 
 Directory& FileSystem::getRootDirectory() const {
-    return this->*rootDirectory;
+    return *rootDirectory;
 }
 
 Directory& FileSystem::getWorkingDirectory() const {
-    return this->*workingDirectory;
+    return *workingDirectory;
 }
 
 void FileSystem::setWorkingDirectory(Directory *newWorkingDirectory) {

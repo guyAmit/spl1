@@ -24,7 +24,7 @@ bool BaseFile::baseFile_Valid_Name(const string &name) {
 
 //File class
 File::File(string name, int size) : BaseFile(name), size(0) {
-    if (size <= 0) {
+    if (size < 0) {
         throw std::exception();
     } else {
         this->size = size;
@@ -55,7 +55,7 @@ void Directory::setParent(Directory *newParent) {
 void Directory::addFile(BaseFile *file) {
     if (!file)
         throw std::exception();
-    if (searchFileName(file->getName()) != children.begin()) {
+    if (children.empty()||searchFileName(file->getName()) == children.end()) {
         children.push_back(file);
     } else {
         throw std::exception();
@@ -128,8 +128,9 @@ vector<BaseFile *>::iterator Directory::searchFileName(string name) {
 
 void Directory::removeFile(string name) {
     auto iterator =searchFileName(name);
-    if(iterator != children.end()){
+    if(!children.empty() && (iterator != children.end())){
         delete children.at(static_cast<unsigned long>(distance(children.begin(), iterator)));
+        children.erase(iterator);
     }
 }
 
@@ -140,14 +141,14 @@ void Directory::removeFile(BaseFile *file) {
 
 void Directory::sortByName() {
     std::sort(children.begin(), children.end(), []( BaseFile *baseFile1, BaseFile *baseFile2) {
-        return  baseFile1->getName() > baseFile2->getName();
+        return  baseFile1->getName() < baseFile2->getName();
     });
 
 }
 
 void Directory::sortBySize() {
     sort(children.begin(), children.end(), [] (BaseFile *baseFile1, BaseFile *baseFile2){
-        return baseFile1->getSize() > baseFile2->getSize();
+        return baseFile1->getSize() < baseFile2->getSize();
     });
 }
 
@@ -165,9 +166,9 @@ int Directory::getSize() {
 
 string Directory::getAbsolutePath() {
     if (!parent)
-        return getName();
+        return"";
     else
-        return parent->getAbsolutePath() + getName();
+        return parent->getAbsolutePath() + "/"+getName();
 }
 
 
