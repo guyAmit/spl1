@@ -18,8 +18,8 @@ string BaseFile::getName() const { return name; }
 void BaseFile::setName(string newName) { name = newName; }
 
 bool BaseFile::baseFile_Valid_Name(const string &name) {
-    return (name!=""&& name.find_first_not_of("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") ==
-            std::string::npos);
+    return (!name.empty() && name.find_first_not_of("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") ==
+                             std::string::npos);
 }
 
 //File class
@@ -55,7 +55,7 @@ void Directory::setParent(Directory *newParent) {
 void Directory::addFile(BaseFile *file) {
     if (!file)
         throw std::exception();
-    if (children.empty()||searchFileName(file->getName()) == children.end()) {
+    if (children.empty() || searchFileName(file->getName()) == children.end()) {
         children.push_back(file);
     } else {
         throw std::exception();
@@ -121,14 +121,14 @@ vector<BaseFile *>::iterator Directory::searchFileName(string name) {
 
     //iterate through the vector and find a matching file name
     auto iterator = find_if(children.begin(), children.end(),
-                           [&name](BaseFile *baseFile)->bool { return baseFile->getName() == name; });
+                            [&name](BaseFile *baseFile) -> bool { return baseFile->getName() == name; });
     return iterator;
 
 }
 
 void Directory::removeFile(string name) {
-    auto iterator =searchFileName(name);
-    if(!children.empty() && (iterator != children.end())){
+    auto iterator = searchFileName(name);
+    if (!children.empty() && (iterator != children.end())) {
         delete children.at(static_cast<unsigned long>(distance(children.begin(), iterator)));
         children.erase(iterator);
     }
@@ -140,15 +140,18 @@ void Directory::removeFile(BaseFile *file) {
 }
 
 void Directory::sortByName() {
-    std::sort(children.begin(), children.end(), []( BaseFile *baseFile1, BaseFile *baseFile2) {
-        return  baseFile1->getName() < baseFile2->getName();
+    std::sort(children.begin(), children.end(), [](BaseFile *baseFile1, BaseFile *baseFile2) {
+        return baseFile1->getName() < baseFile2->getName();
     });
 
 }
 
 void Directory::sortBySize() {
-    sort(children.begin(), children.end(), [] (BaseFile *baseFile1, BaseFile *baseFile2){
-        return baseFile1->getSize() < baseFile2->getSize();
+    sort(children.begin(), children.end(), [](BaseFile *baseFile1, BaseFile *baseFile2) {
+        if (baseFile1->getSize() == baseFile2->getSize())
+            return baseFile1->getName() < baseFile2->getName();
+        else
+            return baseFile1->getSize() < baseFile2->getSize();
     });
 }
 
@@ -166,9 +169,9 @@ int Directory::getSize() {
 
 string Directory::getAbsolutePath() {
     if (!parent)
-        return"";
+        return "";
     else
-        return parent->getAbsolutePath() + "/"+getName();
+        return parent->getAbsolutePath() + "/" + getName();
 }
 
 
