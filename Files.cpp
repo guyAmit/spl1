@@ -32,6 +32,11 @@ File::File(string name, int size) : BaseFile(name), size(0) {
 }
 
 int File::getSize() { return size; }
+bool File::getType() { return false; }
+
+
+
+
 
 //Directory class
 Directory::Directory(string name, Directory *parent) : BaseFile(name) {
@@ -95,6 +100,7 @@ void Directory::steal(Directory &rhs) {
     this->parent = rhs.parent;
     this->setName(rhs.getName());
     this->children = rhs.children;
+    rhs.children.erase(rhs.children.begin(), rhs.children.end());
 }
 
 void Directory::copy(const Directory &rhs) {
@@ -102,7 +108,7 @@ void Directory::copy(const Directory &rhs) {
     this->setName(rhs.getName());
     this->children;
     for (auto baseFile:rhs.children) {
-        if (dynamic_cast<File *>(baseFile))
+        if (!baseFile->getType())
             children.push_back(new File(baseFile->getName(), baseFile->getSize()));
         else {
             children.push_back(new Directory(*dynamic_cast<Directory * >(baseFile)));
@@ -173,6 +179,7 @@ string Directory::getAbsolutePath() {
     else
         return parent->getAbsolutePath() + "/" + getName();
 }
+bool Directory::getType() { return true; }
 
 
 
