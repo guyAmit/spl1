@@ -22,9 +22,11 @@ private:
 public:
     PwdCommand(string args);
     void execute(FileSystem & fs); // Every derived class should implement this function according to the document (pdf)
+    //print the working directory from the instance of file system
     virtual string toString();
 };
 
+//Todo:: implament a function get BaseFile by Path. the function will be used in a the commends
 class CdCommand : public BaseCommand {
 private:
 public:
@@ -33,6 +35,8 @@ public:
     string toString();
 };
 
+
+//print the child vector
 class LsCommand : public BaseCommand {
 private:
 public:
@@ -40,6 +44,7 @@ public:
     void execute(FileSystem & fs);
     string toString();
 };
+
 
 class MkdirCommand : public BaseCommand {
 private:
@@ -57,6 +62,7 @@ public:
     string toString();
 };
 
+//check currect defintion in office hours
 class CpCommand : public BaseCommand {
 private:
 public:
@@ -64,6 +70,7 @@ public:
     void execute(FileSystem & fs);
     string toString();
 };
+
 
 class MvCommand : public BaseCommand {
 private:
@@ -73,6 +80,7 @@ public:
     string toString();
 };
 
+//find and remove
 class RenameCommand : public BaseCommand {
 private:
 public:
@@ -81,6 +89,7 @@ public:
     string toString();
 };
 
+//find and delete
 class RmCommand : public BaseCommand {
 private:
 public:
