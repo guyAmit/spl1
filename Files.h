@@ -23,7 +23,11 @@ public:
     string getName() const;
 
     void setName(string newName);
-
+    /**
+     *
+     * @return true if the type is directory and false if type is file.
+     */
+    virtual bool getType()=0;
     virtual int getSize() = 0;
 
 
@@ -37,6 +41,7 @@ public:
     File(string name, int size); // Constructor
     //todo:: create positive test for size
     int getSize(); // Return the size of the file
+    bool getType();
 
 };
 
@@ -89,6 +94,8 @@ public:
 
     Directory(Directory &&rhs);//move constructor
     Directory &operator=(Directory &&rhs);
+    bool getType();
+
 
 };
 
