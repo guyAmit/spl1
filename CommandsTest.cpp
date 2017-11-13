@@ -191,7 +191,7 @@ int mvTest1(FileSystem &sys){
 }
 
 
-/**RootTest #9::removale of the directory and file created in root
+/**RootTest #11::removale of the directory and file created in root
  * @param sys
  * @pre root contain two files: <dir1,file>
  * @post root is now empty
@@ -210,7 +210,7 @@ int rmTest1(FileSystem &sys){
 }
 
 
-/**RootTest #10::history check
+/**RootTest #11::history check
  * @param sys
  * @pre root contain two files: <dir1,file1>
  * @post root is now empty
@@ -222,13 +222,16 @@ int historyTest1(FileSystem &sys){
 
 int rootTests(FileSystem &sys){
     int counter=0;
-    counter+=pwdTest(sys);
+    counter+=pwdTest1(sys);
     counter+=makeDirTest1(sys);
     counter+=makeFileTest1(sys);
     counter+=makeFileTest2(sys);
     counter+=makeFileTest3(sys);
     counter+=lsTest1(sys);
+    counter+=mvTest1(sys);
     counter+=renameTest1(sys);
+    counter+=renameTest2(sys);
+    counter+=renameTest3(sys);
     counter+=rmTest1(sys);
     counter+=historyTest1(sys);
     return counter;
