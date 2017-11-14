@@ -53,6 +53,9 @@ FileSystem::FileSystem(const FileSystem &rhs) {
     copy(rhs);
 }
 
+FileSystem::FileSystem(FileSystem &&rhs) {
+    steal(rhs);
+}
 FileSystem::~FileSystem() {
     clean();
 }
