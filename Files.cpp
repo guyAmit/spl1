@@ -15,7 +15,13 @@ BaseFile::BaseFile(string name) : name("default") {
 
 string BaseFile::getName() const { return name; }
 
-void BaseFile::setName(string newName) { name = newName; }
+void BaseFile::setName(string newName) {
+    if (baseFile_Valid_Name(newName))
+        this->name = newName;
+    else {
+        throw std::exception();
+    }
+}
 
 bool BaseFile::baseFile_Valid_Name(const string &name) {
     return (!name.empty() && name.find_first_not_of("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") ==
@@ -32,10 +38,8 @@ File::File(string name, int size) : BaseFile(name), size(0) {
 }
 
 int File::getSize() { return size; }
+
 bool File::getType() { return false; }
-
-
-
 
 
 //Directory class
@@ -153,11 +157,9 @@ void Directory::sortByName() {
 }
 
 void Directory::sortBySize() {
-    sort(children.begin(), children.end(), [](BaseFile *baseFile1, BaseFile *baseFile2) {
-        if (baseFile1->getSize() == baseFile2->getSize())
-            return baseFile1->getName() < baseFile2->getName();
-        else
-            return baseFile1->getSize() < baseFile2->getSize();
+    sortByName();
+    stable_sort(children.begin(), children.end(), [](BaseFile *baseFile1, BaseFile *baseFile2) {
+        return baseFile1->getSize() < baseFile2->getSize();
     });
 }
 
@@ -179,7 +181,15 @@ string Directory::getAbsolutePath() {
     else
         return parent->getAbsolutePath() + "/" + getName();
 }
+
 bool Directory::getType() { return true; }
+
+BaseFile *Directory::getBaseFileByName(string name) {
+    auto iterator = searchFileName(name);
+    if (!children.empty() && (iterator != children.end()))
+        return children.at(static_cast<unsigned long>(distance(children.begin(), iterator)));
+    return nullptr;
+}
 
 
 

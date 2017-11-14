@@ -33,7 +33,6 @@ for test perpesese only::implamention of rule of 5
 
 void FileSystem::clean() const {
     delete this->rootDirectory;
-    delete this->workingDirectory;
 }
 
 void FileSystem::copy(const FileSystem &rhs) {
