@@ -66,8 +66,6 @@ void Directory::addFile(BaseFile *file) {
         throw std::exception();
     if (children.empty() || searchFileName(file->getName()) == children.end()) {
         children.push_back(file);
-    } else {
-        throw std::exception();
     }
 
 }

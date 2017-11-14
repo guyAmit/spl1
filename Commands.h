@@ -15,7 +15,9 @@ protected:
  * @param path - the path to split
  * @return the substring until the first '/'.
  */
-    string getsplittedPath(string path);
+    string getsplittedPath(string &path);
+
+    BaseFile *getBaseFileByPath(string &path,Directory* current,FileSystem &fs);
 
 
 public:
@@ -28,7 +30,6 @@ public:
 
     virtual string toString() = 0;
 
-    void cd(string path,Directory* current,FileSystem &fs);
 };
 
 class PwdCommand : public BaseCommand {
@@ -44,6 +45,7 @@ public:
 //Todo:: implament a function get BaseFile by Path. the function will be used in a the commends
 class CdCommand : public BaseCommand {
 private:
+    void cd(string &path,Directory* current,FileSystem &fs);
 public:
     CdCommand(string args);
 
@@ -56,17 +58,22 @@ public:
 //print the child vector
 class LsCommand : public BaseCommand {
 private:
+    void ls(string &path, Directory *current, FileSystem &fs, bool sortType);
+    void print(BaseFile &pFile);
 public:
     LsCommand(string args);
 
     void execute(FileSystem &fs);
 
     string toString();
+
 };
 
 
 class MkdirCommand : public BaseCommand {
 private:
+    void mkdir(string &path, Directory *current, FileSystem &fs);
+
 public:
     MkdirCommand(string args);
 
@@ -77,6 +84,8 @@ public:
 
 class MkfileCommand : public BaseCommand {
 private:
+    void mkfile(string &path, Directory *current, FileSystem &fs,int size,string &name);
+
 public:
     MkfileCommand(string args);
 
