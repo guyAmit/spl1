@@ -53,12 +53,6 @@ int main(int , char **) {
     /*****************************/
 
      null_check_parent(root);
-     try {
-         root.removeFile(&root);
-         red++;
-         std::cout <<"can't delete root"<< std::endl;
-     }
-    catch (std::exception) {}
 
      File * f =new File("hugabuga",5);
      root.addFile(f);
@@ -153,33 +147,10 @@ int main(int , char **) {
     Directory* innerDir=new Directory("innerDir",dir1);
     dir1->addFile(innerDir);
     std::string path_inner="/dir/innerDir";
-    //comper innerDir.GetAbsolutePath to path_inner
+    //compare innerDir.GetAbsolutePath to path_inner
     if(innerDir->getAbsolutePath()!=path_inner){
         red++;
         std::cout<<"absolute path is not correct"<<std::endl;
-    }
-
-    //adding new files for remove tests
-    for (int i = 1; i <11 ; ++i) {
-        innerDir->addFile(new File(std::to_string(i),i*20));
-    }
-
-    //remove from depth 2
-    root.removeFile("20");
-    test={"10","30","40","50","60","70","80","90","100"};
-    extractVals(innerDir->getChildren());
-    if(!comperVec(test,temp)){
-        red++;
-        std::cout<<"remove at depth 2 did not succeed"<<std::endl;
-    }
-
-    //remove from depth 1
-    dir1->removeFile("30");
-    test={"10","40","50","60","70","80","90","100"};
-    extractVals(dir1->getChildren());
-    if(!comperVec(test,temp)){
-        red++;
-        std::cout<<"remove at depth 1 did not succeed"<<std::endl;
     }
 
 
