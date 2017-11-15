@@ -21,7 +21,7 @@ Directory& FileSystem::getWorkingDirectory() const {
 }
 
 void FileSystem::setWorkingDirectory(Directory *newWorkingDirectory) {
-    if(!newWorkingDirectory) {
+    if(newWorkingDirectory) {
         this->workingDirectory = newWorkingDirectory;
     }
     else{throw std::exception();}

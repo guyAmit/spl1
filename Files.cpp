@@ -6,21 +6,13 @@
 
 //BaseFile class
 BaseFile::BaseFile(string name) : name("default") {
-    if (baseFile_Valid_Name(name))
         this->name = name;
-    else {
-        throw std::exception();
-    }
 }
 
 string BaseFile::getName() const { return name; }
 
 void BaseFile::setName(string newName) {
-    if (baseFile_Valid_Name(newName))
         this->name = newName;
-    else {
-        throw std::exception();
-    }
 }
 
 bool BaseFile::baseFile_Valid_Name(const string &name) {

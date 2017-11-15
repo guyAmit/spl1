@@ -25,6 +25,7 @@ public:
     FileSystem &operator=(FileSystem &&rhs);
     FileSystem(const FileSystem &rhs);
     ~FileSystem();
+    FileSystem(FileSystem &&rhs);
 
 };
 

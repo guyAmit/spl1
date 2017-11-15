@@ -128,7 +128,7 @@ public:
 
     string toString();
 
-    void addcopyFile(BaseFile *sourceFile, const BaseFile *destDirectory) const;
+    void addcopyFile(BaseFile *sourceFile, BaseFile *destDirectory) ;
 };
 
 

@@ -66,7 +66,8 @@ pair<string, string> BaseCommand::getTwoPaths() {
 
 string BaseCommand::removeLastPath(string path) {
     size_t pos = path.find_last_of('/');
-    path.erase(pos, path.length() - 1);
+    if (pos != string::npos)
+        path.erase(pos, path.length() - 1);
     return path;
 }
 
@@ -137,7 +138,10 @@ LsCommand::LsCommand(string args) : BaseCommand(args) {}
 
 void LsCommand::execute(FileSystem &fs) {
     pair<string, string> args = getTwoPaths();
-    ls(args.second, &fs.getWorkingDirectory(), fs, args.first == "-s");
+    if (args.first == "-s")
+        ls(args.second, &fs.getWorkingDirectory(), fs, true);
+    else
+        ls(args.first, &fs.getWorkingDirectory(), fs, false);
 }
 
 void LsCommand::ls(string &path, Directory *current, FileSystem &fs, bool sortType) {
@@ -243,9 +247,14 @@ void MkfileCommand::execute(FileSystem &fs) {
     size_t pos = args.find('$');
     string path = args.substr(0, pos);
     args.erase(0, pos + 1);
-    pos = path.find_last_of('/');
-    string fileName = path.substr(pos + 1, path.length() - 1);
-    path.erase(pos, path.length() - 1);
+    string fileName;
+    if ((pos = path.find_last_of('/')) != string::npos) {
+        fileName = path.substr(pos + 1, path.length() - 1);
+        path.erase(pos, path.length() - 1);
+    } else {
+        fileName = path;
+        path = "";
+    }
     int size = std::stoi(args);
     mkfile(path, &fs.getWorkingDirectory(), fs, size, fileName);
 }
@@ -304,7 +313,7 @@ void CpCommand::execute(FileSystem &fs) {
     msg = "No such file or directory";
 }
 
-void CpCommand::addcopyFile(BaseFile *sourceFile, const BaseFile *destDirectory) const {
+void CpCommand::addcopyFile(BaseFile *sourceFile, BaseFile *destDirectory) {
     if (sourceFile->getType()) {
         (dynamic_cast<Directory *>(destDirectory))->addFile(new Directory(*dynamic_cast<Directory *>(sourceFile)));
     } else {
@@ -389,15 +398,19 @@ void RmCommand::execute(FileSystem &fs) {
     string path = getArgs();
     BaseFile *sourceFile = getBaseFileByPath(path, &fs.getWorkingDirectory(), fs);
     string sourceDirStr = removeLastPath(path);
-    BaseFile *sourceDir = getBaseFileByPath(sourceDirStr, &fs.getWorkingDirectory(), fs);
+    BaseFile *sourceDir;
+    if (sourceDirStr.empty())
+        sourceDir =  &fs.getWorkingDirectory();
+    else
+        sourceDir = getBaseFileByPath(sourceDirStr, &fs.getWorkingDirectory(), fs);
     if (!sourceDir || !sourceFile) {
         cout << "No such file or directory" << endl;
         msg = "No such file or directory";
         return;
     }
     if (!checkParents(sourceFile, fs)) {
-        cout << "Can't rename the working directory" << endl;
-        msg = "Can't rename the working directory";
+        cout << "Can't remove the working directory" << endl;
+        msg = "Can't remove the working directory";
         return;
     }
     dynamic_cast<Directory *>(sourceDir)->removeFile(sourceFile);
@@ -414,7 +427,7 @@ HistoryCommand::HistoryCommand(string args, const vector<BaseCommand *> &history
 }
 
 void HistoryCommand::execute(FileSystem &fs) {
-    for (int i = 0; i < dynamic_cast<int>(history.size()), ++i;) {
+    for (size_t i = 0; i < history.size(), ++i;) {
         if (history[i]->getArgs().find('$') != string::npos) {
             pair<string, string> args = splitArgs(history[i]->getArgs());
             cout << i << "\t" << history[i]->toString() << " " << args.first << " " << args.second << endl;
@@ -452,6 +465,7 @@ string VerboseCommand::toString() {
 ErrorCommand::ErrorCommand(string args) : BaseCommand(args) {
 
 }
+
 //todo:: assuming the commands name is the args
 void ErrorCommand::execute(FileSystem &fs) {
     cout << getArgs() << ": Unknown command" << endl;
