@@ -70,11 +70,11 @@ string BaseCommand::removeLastPath(string path) {
     return path;
 }
 
-bool BaseCommand::checkParents(BaseFile *basefile,FileSystem &fs) {
+bool BaseCommand::checkParents(BaseFile *basefile, FileSystem &fs) {
     Directory *current = &fs.getWorkingDirectory();
-    if(basefile->getType()){
+    if (basefile->getType()) {
         while (current != nullptr) {
-            if (basefile==current)
+            if (basefile == current)
                 return false;
             current = current->getParent();
         }
@@ -100,6 +100,7 @@ CdCommand::CdCommand(string args) : BaseCommand(args) {
 void CdCommand::cd(string &path, Directory *current, FileSystem &fs) {
     if (!current && !path.empty()) {
         cout << "The system cannot find the path specified" << endl;
+        msg = "The system cannot find the path specified";
     }
     if (path.empty()) {
         fs.setWorkingDirectory(current);
@@ -119,6 +120,7 @@ void CdCommand::cd(string &path, Directory *current, FileSystem &fs) {
         cd(path, dynamic_cast<Directory *>(basefile), fs);
     } else {
         cout << "The system cannot find the path specified" << endl;
+        msg = "The system cannot find the path specified";
     }
 
 }
@@ -141,6 +143,7 @@ void LsCommand::execute(FileSystem &fs) {
 void LsCommand::ls(string &path, Directory *current, FileSystem &fs, bool sortType) {
     if (!current) {
         cout << "The system cannot find the path specified" << endl;
+        msg = "The system cannot find the path specified";
         return;
     }
     if (path.empty()) {
@@ -166,6 +169,7 @@ void LsCommand::ls(string &path, Directory *current, FileSystem &fs, bool sortTy
         ls(path, dynamic_cast<Directory *>(basefile), fs, sortType);
     } else {
         cout << "The system cannot find the path specified" << endl;
+        msg = "The system cannot find the path specified";
     }
 }
 
@@ -176,6 +180,7 @@ void LsCommand::print(BaseFile &pFile) {
     else
         type = "FILE";
     cout << type << "\t" << pFile.getName() << "\t" << pFile.getSize() << endl;
+    msg = type + "\t" + pFile.getName() + "\t" + std::to_string(pFile.getSize());
 }
 
 string LsCommand::toString() {
@@ -194,7 +199,7 @@ void MkdirCommand::execute(FileSystem &fs) {
 
 void MkdirCommand::mkdir(string &path, Directory *current, FileSystem &fs) {
     if (!current) {
-        throw std::exception();
+        return;
     }
     if (path.empty()) {
         return;
@@ -218,7 +223,10 @@ void MkdirCommand::mkdir(string &path, Directory *current, FileSystem &fs) {
     if (basefile->getType()) {
         if (!path.empty())
             mkdir(path, dynamic_cast<Directory *>(basefile), fs);
-        else cout << "The directory already exists" << endl;
+        else {
+            cout << "The directory already exists" << endl;
+            msg = "The directory already exists";
+        }
     }
     //todo:: check the case where the name of the the directory is a file
 }
@@ -251,6 +259,7 @@ void MkfileCommand::mkfile(string &path, Directory *current, FileSystem &fs, int
         }
         if (!basefile->getType()) {
             cout << "File already exists" << endl;
+            msg = "File already exists";
             return;
         }
     }
@@ -268,6 +277,7 @@ void MkfileCommand::mkfile(string &path, Directory *current, FileSystem &fs, int
         mkfile(path, dynamic_cast<Directory *>(basefile), fs, size, name);
     } else {
         cout << "The system cannot find the path specified" << endl;
+        msg = "The system cannot find the path specified";
     }
 }
 
@@ -291,7 +301,7 @@ void CpCommand::execute(FileSystem &fs) {
         return;
     }
     cout << "No such file or directory" << endl;
-
+    msg = "No such file or directory";
 }
 
 void CpCommand::addcopyFile(BaseFile *sourceFile, const BaseFile *destDirectory) const {
@@ -321,10 +331,12 @@ void MvCommand::execute(FileSystem &fs) {
     BaseFile *destDir = getBaseFileByPath(destination, &fs.getWorkingDirectory(), fs);
     if (!sourceDir || !destDir || !sourceFile || !destDir->getType()) {
         cout << "No such file or directory" << endl;
+        msg = "No such file or directory";
         return;
     }
-    if (!checkParents(sourceFile,fs)) {
+    if (!checkParents(sourceFile, fs)) {
         cout << "Can't move directory" << endl;
+        msg = "Can't move directory";
         return;
     }
     if (dynamic_cast<Directory *>(destDir)->getBaseFileByName(sourceFile->getName()))
@@ -352,12 +364,14 @@ void RenameCommand::execute(FileSystem &fs) {
     BaseFile *sourceDir = getBaseFileByPath(sourceDirStr, &fs.getWorkingDirectory(), fs);
     if (!sourceDir || !sourceFile) {
         cout << "No such file or directory" << endl;
+        msg = "No such file or directory";
         return;
     }
     if (dynamic_cast<Directory *>(sourceDir)->getBaseFileByName(sourceFile->getName()))
         return;
-    if (!checkParents(sourceFile,fs)) {
+    if (!checkParents(sourceFile, fs)) {
         cout << "Can't rename the working directory" << endl;
+        msg = "Can't rename the working directory";
         return;
     }
     sourceFile->setName(newName);
@@ -378,10 +392,12 @@ void RmCommand::execute(FileSystem &fs) {
     BaseFile *sourceDir = getBaseFileByPath(sourceDirStr, &fs.getWorkingDirectory(), fs);
     if (!sourceDir || !sourceFile) {
         cout << "No such file or directory" << endl;
+        msg = "No such file or directory";
         return;
     }
-    if (!checkParents(sourceFile,fs)) {
+    if (!checkParents(sourceFile, fs)) {
         cout << "Can't rename the working directory" << endl;
+        msg = "Can't rename the working directory";
         return;
     }
     dynamic_cast<Directory *>(sourceDir)->removeFile(sourceFile);
@@ -402,8 +418,11 @@ void HistoryCommand::execute(FileSystem &fs) {
         if (history[i]->getArgs().find('$') != string::npos) {
             pair<string, string> args = splitArgs(history[i]->getArgs());
             cout << i << "\t" << history[i]->toString() << " " << args.first << " " << args.second << endl;
+            msg = std::to_string(i) + history[i]->toString() + " " + args.first + " " + args.second;
         } else {
             cout << i << "\t" << history[i]->toString() << " " << history[i]->getArgs() << endl;
+            msg = std::to_string(i) + history[i]->toString() + " " + history[i]->getArgs();
+
         }
     }
 }
@@ -420,6 +439,7 @@ void VerboseCommand::execute(FileSystem &fs) {
     int newVerbose = std::stoi(getArgs());
     if (newVerbose != 0 && newVerbose != 1 && newVerbose != 2 && newVerbose != 3) {
         cout << "Wrong verbose input" << endl;
+        msg = "Wrong verbose input";
         return;
     }
     verbose = static_cast<unsigned int>(newVerbose);
@@ -432,16 +452,17 @@ string VerboseCommand::toString() {
 ErrorCommand::ErrorCommand(string args) : BaseCommand(args) {
 
 }
-
+//todo:: assuming the commands name is the args
 void ErrorCommand::execute(FileSystem &fs) {
     cout << getArgs() << ": Unknown command" << endl;
+    msg = getArgs() + ": Unknown command";
 }
 
 string ErrorCommand::toString() {
     return getArgs();
 }
 
-ExecCommand::ExecCommand(string args, const vector<BaseCommand *> &history) :BaseCommand(args),history(history){
+ExecCommand::ExecCommand(string args, const vector<BaseCommand *> &history) : BaseCommand(args), history(history) {
 
 }
 
@@ -449,6 +470,7 @@ void ExecCommand::execute(FileSystem &fs) {
     int commandNumber = std::stoi(getArgs());
     if (commandNumber > history.size() - 1) {
         cout << "Command not found" << endl;
+        msg = "Command not found";
     } else {
         history[commandNumber]->execute(fs);
     }

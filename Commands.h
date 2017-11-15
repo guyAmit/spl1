@@ -5,12 +5,12 @@
 #include "FileSystem.h"
 #include <iostream>
 #include "GlobalVariables.h"
-
-
+//todo::delete msg and change the public methods to protected
+static string msg;
 class BaseCommand {
 private:
     string args;
-protected:
+public:
     /**
  *
  * @param path - the path to split
@@ -44,7 +44,7 @@ protected:
     bool checkParents(BaseFile * basefile,FileSystem &fs);
 
 
-public:
+
 
     BaseCommand(string args);
 
