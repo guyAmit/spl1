@@ -5,12 +5,13 @@
 #include "FileSystem.h"
 #include <iostream>
 #include "GlobalVariables.h"
-//todo::delete msg and change the public methods to protected
-static string msg;
+
 class BaseCommand {
 private:
     string args;
 public:
+//todo::delete msg and change the public methods to protected
+    string msg;
     /**
  *
  * @param path - the path to split
