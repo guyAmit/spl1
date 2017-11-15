@@ -4,6 +4,7 @@
 #include <string>
 #include "FileSystem.h"
 #include <iostream>
+#include "GlobalVariables.h"
 
 
 class BaseCommand {
@@ -18,6 +19,29 @@ protected:
     string getsplittedPath(string &path);
 
     BaseFile *getBaseFileByPath(string &path,Directory* current,FileSystem &fs);
+    /**
+     * splits the args field (string) into two strings by '$'.
+     *
+     * @return  two strings- the first is the string before '$'. the second- the string after '$'.
+     */
+   pair <string, string> getTwoPaths();
+    /**
+     * splits the args (string) into two strings by '$'.
+     *@param args -the string to split
+     * @return  two strings- the first is the string before '$'. the second- the string after '$'.
+     */
+    pair<string, string> splitArgs(string args);
+    /**
+*
+* @param path - the path to split
+* @return the string before the last '/'
+*/
+    string removeLastPath(string path);
+/**
+ *
+ * @return iff the basefile is not a child of the root directory or the working directory
+ */
+    bool checkParents(BaseFile * basefile,FileSystem &fs);
 
 
 public:
@@ -42,7 +66,7 @@ public:
     virtual string toString();
 };
 
-//Todo:: implament a function get BaseFile by Path. the function will be used in a the commends
+//Todo:: implement a function get BaseFile by Path. the function will be used in a the commands
 class CdCommand : public BaseCommand {
 private:
     void cd(string &path,Directory* current,FileSystem &fs);
@@ -103,6 +127,8 @@ public:
     void execute(FileSystem &fs);
 
     string toString();
+
+    void addcopyFile(BaseFile *sourceFile, const BaseFile *destDirectory) const;
 };
 
 
