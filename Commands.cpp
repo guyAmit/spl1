@@ -361,10 +361,7 @@ void MvCommand::execute(FileSystem &fs) {
     string source = paths.first;
     string destination = paths.second;
     BaseFile *sourceFile;
-    if (source == "/")
-        sourceFile = &fs.getRootDirectory();
-    else
-        sourceFile = getBaseFileByPath(source, &fs.getWorkingDirectory(), fs);
+    sourceFile = getBaseFileByPath(source, &fs.getWorkingDirectory(), fs);
     string sourceDirStr = removeLastPath(source);
     BaseFile *sourceDir;
     if (sourceDirStr.empty())
@@ -390,11 +387,9 @@ void MvCommand::execute(FileSystem &fs) {
         return;
     dynamic_cast<Directory *>(destDir)->addFile(sourceFile);
     Directory *sourceDirCasted = dynamic_cast<Directory *>(sourceDir);
-    auto it = sourceDirCasted->searchFileName(sourceFile->getName());
-//    sourceDirCasted->getChildren().erase
     sourceDirCasted->eraseByName(sourceFile->getName());
     if (sourceFile->getType()) {
-        sourceDirCasted->setParent(dynamic_cast<Directory *>(destDir));
+        dynamic_cast<Directory *>(sourceFile)->setParent(dynamic_cast<Directory *>(destDir));
     }
 }
 
