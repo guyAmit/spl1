@@ -17,9 +17,10 @@ private:
 public:
     Environment();
     void start();
-    FileSystem& getFileSystem() const; // Get a reference to the file system
+    FileSystem& getFileSystem() ; // Get a reference to the file system
     void addToHistory(BaseCommand *command); // Add a new command to the history
     const vector<BaseCommand*>& getHistory() const; // Return a reference to the history of commands
+    void createCommand(const string &x, const string &y,const string &z) ;
 };
 
 #endif

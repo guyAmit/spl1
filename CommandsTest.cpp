@@ -243,11 +243,11 @@ int rootTests(FileSystem &sys){
 
 
 
-int main(int main(int , char **)){
-    int red;
-    FileSystem *sys = new FileSystem();
-    red+=rootTests(*sys);
-    if(red>0) throw std::exception();
-
-}
+//int main(int main(int , char **)){
+//    int red;
+//    FileSystem *sys = new FileSystem();
+//    red+=rootTests(*sys);
+//    if(red>0) throw std::exception();
+//
+//}
 
