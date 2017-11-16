@@ -6,8 +6,6 @@
 #include "Files.h"
 #include "FileSystem.h"
 #include "Commands.h"
-#include "vector"
-#include "string"
 
 using namespace std;
 
@@ -107,7 +105,7 @@ int makeFileTest3(FileSystem &sys) {
 int lsTest1(FileSystem &sys) {
     LsCommand ls("/");
     ls.execute(sys);
-    if (ls.msg != "DIR    dir1    0\nFILE     file1   1000") {
+    if (ls.msg != "DIR\tdir1\t0\nFILE\tfile1\t1000\n") {
         std::cout << "ls is not correct lsTest1" << std::endl;
         return 1;
     }
@@ -231,13 +229,13 @@ int rootTests(FileSystem &sys) {
     counter += makeFileTest1(sys);
     counter += makeFileTest2(sys);
     counter += makeFileTest3(sys);
-//    counter += lsTest1(sys);
+    counter += lsTest1(sys);
     counter += mvTest1(sys);
     counter += renameTest1(sys);
     counter += renameTest2(sys);
     counter += renameTest3(sys);
     counter += rmTest1(sys);
-    counter += historyTest1(sys);
+    //  counter += historyTest1(sys);
     return counter;
 }
 
@@ -282,7 +280,7 @@ int lvl2CdTest1(FileSystem &sys) {
     return 0;
 }
 
-/**Lvel2Test #2:: making a new directory inside dir1 from inside the folder dir1
+/**Lvel2Test #2:: making a new file inside dir1 from inside the folder dir1
  * @param sys
  * @pre root is <f1,dir1,dir2,dir3>, working directory is "/dir1"
  * @post dir1 has changed to <file2>
@@ -304,7 +302,7 @@ int lvl2MkFileTest1(FileSystem &sys) {
     return 0;
 }
 
-/**Lvel2Test #3:: making a new directory inside dir1 from inside the folder dir1
+/**Lvel2Test #3:: making a new file inside dir1 from inside the folder dir1
  * @param sys
  * @pre root is <f1,dir1,dir2,dir3>, working directory is "/dir1, dir1 is now <file2>"
  * @post dir1 has changed to <file2>
@@ -329,7 +327,7 @@ int lvl2MkFileTest2(FileSystem &sys) {
 /**Lvel2Test #4:: going from dir1 upwards to root
  * @param sys
  * @pre root is <f1,dir1,dir2,dir3>, working directory is "/dir1"
- * @post dir1 has changed to <file2>
+ * @post dir1 has changed to <file2,file3>
  * @return 1->test field 0->good
  */
 int lvl2CdTest2(FileSystem &sys) {
@@ -348,10 +346,10 @@ int lvl2CdTest2(FileSystem &sys) {
     return 0;
 }
 
-/**Lvel2Test #5:: making a new file inside dir1
+/**Lvel2Test #5:: making a new file inside dir2
  * @param sys
- * @pre root is <f1,dir1,dir2,dir3>, working directory is "/", dir1 is now <file2>"
- * @post dir1 has changed to <file2,file3>
+ * @pre root is <f1,dir1,dir2,dir3>, working directory is "/", dir1 is now <file2,file3>"
+ * @post dir2 has changed to <file4>
  * @return 1->test field 0->good
  */
 int lvl2MkFileTest3(FileSystem &sys) {
@@ -376,7 +374,7 @@ int lvl2MkFileTest3(FileSystem &sys) {
 
 /**Lvel2Test #6:: copying file1 from "/" to "/dir3"
  * @param sys
- * @pre root is <f1,dir1,dir2,dir3>, working directory is "/", dir1 is now <file2,file3>"
+ * @pre root is <f1,dir1,dir2,dir3>, working directory is "/", dir1 is now <file2,file3>", dir2 is now <file4>
  * @post dir3 has changed to <file1>
  * @return 1->test field 0->good
  */
@@ -400,10 +398,10 @@ int lvl2CpTest1(FileSystem &sys) {
     return 0;
 }
 
-/**Lvel2Test #6:: copying file1 from "/dir1" to "/dir2
+/**Lvel2Test #6:: copying file2 from "/dir1" to "/dir2
  * @param sys
- * @pre root is <f1,dir1,dir2,dir3>, working directory is "/", dir1 is now <file2,file3>"
- * @post dir3 has changed to <file1>
+ * @pre root is <f1,dir1,dir2,dir3>, working directory is "/", dir1 is now <file2,file3>",  dir2 is now <file4>
+ * @post dir2 has changed to <file2,file4>
  * @return 1->test field 0->good
  */
 int lvl2CpTest2(FileSystem &sys) {
@@ -428,7 +426,7 @@ int lvl2CpTest2(FileSystem &sys) {
 
 /**Lvel2Test #7:: removing file1 from "/" to
  * @param sys
- * @pre root is <file1,dir1,dir2,dir3>, working directory is "/", dir1 is now <file2,file3>, dir3 is now <file1>"
+ * @pre root is <file1,dir1,dir2,dir3>, working directory is "/", dir1 is now <file2,file3>, dir2 is now <file2,file4>" dir3 is now <file1>
  * @post root is now <dir1,dir2,dir3>
  * @return 1->test field 0->good
  */
@@ -450,7 +448,7 @@ int lvl2RmTest1(FileSystem &sys) {
 
 /**Lvel2Test #8:: removing dir3 from "/"
  * @param sys
- * @pre root is <dir1,dir2,dir3>, working directory is "/", dir1 is now <file2,file3>
+ * @pre root is <dir1,dir2,dir3>, working directory is "/", dir1 is now <file2,file3>  dir2 is now <file2,file4> dir3 is now <file1>
  * @post root is now <dir1,dir2>
  * @return 1->test field 0->good
  */
@@ -473,7 +471,7 @@ int lvl2RmTest2(FileSystem &sys) {
 
 /**Lvel2Test #9:: creating two folders at the same time
  * @param sys
- * @pre root is <dir1,dir2>, working directory is "/", dir1 is now <file2,file3>
+ * @pre root is <dir1,dir2>, working directory is "/", dir1 is now <file2,file3>  dir2 is now <file2,file4>
  * @post root is now <dir1,dir2,dir4> and dir4 is <dir5>
  * @return 1->test field 0->good
  */
@@ -499,7 +497,7 @@ int lvl2MkDIrTest1(FileSystem &sys) {
 
 /**Lvel2Test #10:: trying to go inside dir3 whitch we have just deleted
  * @param sys
- * @pre root is <dir1,dir2,dir4>, working directory is "/", dir1 is now <file2,file3>
+ * @pre root is <dir1,dir2,dir4>, working directory is "/", dir1 is now <file2,file3>  dir2 is now <file2,file4>
  * @post root is now <dir1,dir2,dir4> and dir4 is <dir5>
  * @return 1->test field 0->good
  */
@@ -521,13 +519,13 @@ int lvl2CdTest3(FileSystem &sys) {
 
 /**Lvel2Test #11:: moving dir2 to dir1
  * @param sys
- * @pre root is <dir1,dir2,dir4>, working directory is "/", dir1 is now <file2,file3>
- * @post root is now <dir1,dir4> and dir4 is <dir5> and dir1 is <file2,file3,dir2>, working directory is root
+ * @pre root is <dir1,dir2,dir4>, working directory is "/", dir1 is now <file2,file3> and dir2 is now <file2,file4>
+ * @post root is now <dir1,dir4> and dir4 is <dir5> and dir1 is <file2,file3,dir2>, working directory is root and  dir2 is <file2,file4>
  * @return 1->test field 0->good
  */
 int lvl2MvTest1(FileSystem &sys) {
     MvCommand mv("/dir2 /dir1");
-        CdCommand cd("/dir1");
+    CdCommand cd("/dir1");
     CdCommand cd1("/dir1/dir2");
     CdCommand cd2("..");
     try {
@@ -556,8 +554,8 @@ int lvl2MvTest1(FileSystem &sys) {
 
 /**Lvel2Test #12:: removing file4 from "/dir1/dir2/"
  * @param sys
- * @pre root is <dir2,dir4>, working directory is "/", dir1 is now <file2,file3,dir2>
- * @post root is now <dir1,dir4> and dir4 is <dir5> and dir1 is <file2,file3,dir2>, working directory is root, dir2 is <>
+ * @pre root is <dir2,dir4>, working directory is "/", dir1 is now <file2,file3,dir2> and  dir2 is <file2,file4>
+ * @post root is now <dir1,dir4> and dir4 is <dir5> and dir1 is <file2,file3,dir2>, working directory is root, dir2 is <file2>
  * @return 1->test field 0->good
  */
 int lvl2RmTest3(FileSystem &sys) {
@@ -567,7 +565,7 @@ int lvl2RmTest3(FileSystem &sys) {
     try {
         rm.execute(sys);
         cd1.execute(sys);
-        if (!sys.getWorkingDirectory().getChildren().empty()) {
+        if (sys.getWorkingDirectory().getChildren().size()!=1) {
             std::cout << "file4 was not removed from dir2 on lvl2RmTest3" << std::endl;
             return 1;
         }
@@ -585,17 +583,17 @@ int lvl2RmTest3(FileSystem &sys) {
 
 /**Lvel2Test #13:: testing ls -s command on root"
  * @param sys
- * @pre root is now <dir1,dir4> and dir4 is <dir5> and dir1 is <file2,file3,dir2>, working directory is root, dir2 is <>
- * @post root is now <dir1,dir4> and dir4 is <dir5> and dir1 is <file2,file3,dir2>, working directory is root, dir2 is <>
+ * @pre root is now <dir1,dir4> and dir4 is <dir5> and dir1 is <file2,file3,dir2>, dir2 is <file2> working directory is root, dir2 is <>
+ * @post root is now <dir1,dir4> and dir4 is <dir5> and dir1 is <file2,file3,dir2>, working directory is root, dir2 is <file2>
  * @return 1->test field 0->good
  */
 int lvl2LsTest1(FileSystem &sys) {
-    LsCommand ls("-s");
+    LsCommand ls("-s /");
     try {
         CdCommand cd("/");
         cd.execute(sys);
         ls.execute(sys);
-        if (ls.msg != "DIR\tdir4\t0\nDIR\tdir1\t250") {
+        if (ls.msg != "DIR\tdir4\t0\nDIR\tdir1\t350\n") {
             std::cout << "ls -s did not print the correct msg on lvl2LsTest1" << std::endl;
             return 1;
         }
@@ -609,13 +607,13 @@ int lvl2LsTest1(FileSystem &sys) {
 
 /**Lvel2Test #14:: removing dir1 from root
  * @param sys
- * @pre root is now <dir1,dir4> and dir4 is <dir5> and dir1 is <file2,file3,dir2>, working directory is root, dir2 is <>
+ * @pre root is now <dir1,dir4> and dir4 is <dir5> and dir1 is <file2,file3,dir2>, working directory is root, dir2 is <file2>
  * @post root is now <dir4> and dir4 is <dir5> , working directory is root
  * @return 1->test field 0->good
  */
 int lvl2RmTest4(FileSystem &sys) {
     RmCommand rm("/dir1");
-    LsCommand ls("-s");
+    LsCommand ls("-s /");
     try {
         rm.execute(sys);
         if (sys.getWorkingDirectory().getChildren().size() != 1) {
@@ -623,7 +621,7 @@ int lvl2RmTest4(FileSystem &sys) {
             return 1;
         }
         ls.execute(sys);
-        if (ls.msg != "DIR\tdir4\t0") {
+        if (ls.msg != "DIR\tdir4\t0\n") {
             std::cout << "dir2 was not deleted from root on lvl2RmTest4" << std::endl;
             return 1;
         }
@@ -683,24 +681,18 @@ int levelTwoTests(FileSystem &sys) {
 /***********************************************************
  * main tests on level #2   *
  ************************************************************/
-//int main(int, char **) {
-//    int red1;
-//    FileSystem *sys1 = new FileSystem();
-//    red1 += rootTests(*sys1);
-//    std::cout << "root level: red:" << red1 << "green:" << 11 - red1 << std::endl;
-//    if (red1 > 0) {
-//        throw std::exception();
-//    }
-//    delete sys1;
-//    int red2 = 0;
-//    FileSystem *sys2 = new FileSystem();
-//    red2 += levelTwoTests(*sys2);
-//    std::cout << "level 2: red:" << red1 << "green:" << 15 - red1 << std::endl;
-//    if (red2 > 0) {
-//        throw std::exception();
-//    }
-//
-//
-//}
+int main(int, char **) {
+    int red1=0;
+    FileSystem *sys1 = new FileSystem();
+    red1 += rootTests(*sys1);
+    std::cout << "root level: red: " << red1 << " green: " << 11 - red1 << std::endl;
+    delete sys1;
+    int red2 = 0;
+    FileSystem *sys2 = new FileSystem();
+    red2 += levelTwoTests(*sys2);
+    std::cout << "level 2: red: " << red2 << " green: " << 15 - red2 << std::endl;
+
+
+}
 
 

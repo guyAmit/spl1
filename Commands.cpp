@@ -202,7 +202,7 @@ void LsCommand::print(BaseFile &pFile) {
     else
         type = "FILE";
     cout << type << "\t" << pFile.getName() << "\t" << pFile.getSize() << endl;
-    msg = type + "\t" + pFile.getName() + "\t" + std::to_string(pFile.getSize());
+    msg += type + "\t" + pFile.getName() + "\t" + std::to_string(pFile.getSize())+"\n";
 }
 
 string LsCommand::toString() {
