@@ -7,7 +7,7 @@
 BaseCommand::BaseCommand(string args) : args(args) {}
 
 
-string BaseCommand::getsplittedPath(string &path) {
+pair<string, string> BaseCommand::getsplittedPath(string path) {
     string splittedPath;
     size_t pos = 0;
     if ((pos = path.find('/')) != string::npos) {
@@ -17,18 +17,26 @@ string BaseCommand::getsplittedPath(string &path) {
         splittedPath = path;
         path = "";
     }
-    return splittedPath;
+    pair<string, string> pair1;
+    pair1.first = splittedPath;
+    pair1.second = path;
+    return pair1;
 }
 
 string BaseCommand::getArgs() {
     return args;
 }
 
-BaseFile *BaseCommand::getBaseFileByPath(string &path, Directory *current, FileSystem &fs) {
+BaseFile *BaseCommand::getBaseFileByPath(string path, Directory *current, FileSystem &fs) {
     if (!current) {
         return nullptr;
     }
-    string splittedPath = getsplittedPath(path);
+    if (path.empty()) {
+        return nullptr;
+    }
+    pair<string, string> splittedPair = getsplittedPath(path);
+    string splittedPath = splittedPair.first;
+    path = splittedPair.second;
     if (splittedPath.empty()) {
         return getBaseFileByPath(path, &fs.getRootDirectory(), fs);
     }
@@ -43,7 +51,7 @@ BaseFile *BaseCommand::getBaseFileByPath(string &path, Directory *current, FileS
 
 pair<string, string> BaseCommand::splitArgs(string args) {
     pair<string, string> pair;
-    size_t pos = args.find('$');
+    size_t pos = args.find(' ');
     string path1 = args.substr(0, pos);
     args.erase(0, pos + 1);
     string path2 = args;
@@ -55,7 +63,7 @@ pair<string, string> BaseCommand::splitArgs(string args) {
 pair<string, string> BaseCommand::getTwoPaths() {
     pair<string, string> pair;
     string args = getArgs();
-    size_t pos = args.find('$');
+    size_t pos = args.find(' ');
     string path1 = args.substr(0, pos);
     args.erase(0, pos + 1);
     string path2 = args;
@@ -66,8 +74,13 @@ pair<string, string> BaseCommand::getTwoPaths() {
 
 string BaseCommand::removeLastPath(string path) {
     size_t pos = path.find_last_of('/');
-    if (pos != string::npos)
+    if ((pos == 0) && (pos == path.find('/'))) {
+        path = "/";
+    } else if (pos != string::npos) {
         path.erase(pos, path.length() - 1);
+    } else {
+        path = "";
+    }
     return path;
 }
 
@@ -88,6 +101,7 @@ PwdCommand::PwdCommand(string args) : BaseCommand(args) {}
 
 void PwdCommand::execute(FileSystem &fs) {
     cout << fs.getWorkingDirectory().getAbsolutePath() << endl;
+    msg = fs.getWorkingDirectory().getAbsolutePath();
 }
 
 string PwdCommand::toString() {
@@ -107,7 +121,9 @@ void CdCommand::cd(string &path, Directory *current, FileSystem &fs) {
         fs.setWorkingDirectory(current);
         return;
     }
-    string splittedPath = getsplittedPath(path);
+    pair<string, string> splittedPair = getsplittedPath(path);
+    string splittedPath = splittedPair.first;
+    path = splittedPair.second;
     if (splittedPath.empty()) {
         cd(path, &fs.getRootDirectory(), fs);
         return;
@@ -144,7 +160,7 @@ void LsCommand::execute(FileSystem &fs) {
         ls(args.first, &fs.getWorkingDirectory(), fs, false);
 }
 
-void LsCommand::ls(string &path, Directory *current, FileSystem &fs, bool sortType) {
+void LsCommand::ls(string path, Directory *current, FileSystem &fs, bool sortType) {
     if (!current) {
         cout << "The system cannot find the path specified" << endl;
         msg = "The system cannot find the path specified";
@@ -159,7 +175,9 @@ void LsCommand::ls(string &path, Directory *current, FileSystem &fs, bool sortTy
             print(*basefile);
         return;
     }
-    string splittedPath = getsplittedPath(path);
+    pair<string, string> splittedPair = getsplittedPath(path);
+    string splittedPath = splittedPair.first;
+    path = splittedPair.second;
     if (splittedPath.empty()) {
         ls(path, &fs.getRootDirectory(), fs, sortType);
         return;
@@ -201,14 +219,16 @@ void MkdirCommand::execute(FileSystem &fs) {
     mkdir(path, &fs.getWorkingDirectory(), fs);
 }
 
-void MkdirCommand::mkdir(string &path, Directory *current, FileSystem &fs) {
+void MkdirCommand::mkdir(string path, Directory *current, FileSystem &fs) {
     if (!current) {
         return;
     }
     if (path.empty()) {
         return;
     }
-    string splittedPath = getsplittedPath(path);
+    pair<string, string> splittedPair = getsplittedPath(path);
+    string splittedPath = splittedPair.first;
+    path = splittedPair.second;
     if (splittedPath.empty()) {
         mkdir(path, &fs.getRootDirectory(), fs);
         return;
@@ -243,12 +263,16 @@ MkfileCommand::MkfileCommand(string args) : BaseCommand(args) {
 }
 
 void MkfileCommand::execute(FileSystem &fs) {
-    string args = getArgs();
-    size_t pos = args.find('$');
+    string args = getArgs();//split the size and the path
+    size_t pos = args.find(' ');
     string path = args.substr(0, pos);
     args.erase(0, pos + 1);
     string fileName;
-    if ((pos = path.find_last_of('/')) != string::npos) {
+    pos = path.find_last_of('/');
+    if ((pos == 0) && (pos == path.find('/'))) {
+        fileName = path.substr(1, path.size() - 1);
+        path = "/";
+    } else if (pos != string::npos) {
         fileName = path.substr(pos + 1, path.length() - 1);
         path.erase(pos, path.length() - 1);
     } else {
@@ -259,7 +283,7 @@ void MkfileCommand::execute(FileSystem &fs) {
     mkfile(path, &fs.getWorkingDirectory(), fs, size, fileName);
 }
 
-void MkfileCommand::mkfile(string &path, Directory *current, FileSystem &fs, int size, string &name) {
+void MkfileCommand::mkfile(string path, Directory *current, FileSystem &fs, int size, string &name) {
     if (path.empty()) {
         BaseFile *basefile = current->getBaseFileByName(name);
         if (!basefile) {
@@ -272,7 +296,9 @@ void MkfileCommand::mkfile(string &path, Directory *current, FileSystem &fs, int
             return;
         }
     }
-    string splittedPath = getsplittedPath(path);
+    pair<string, string> splittedPair = getsplittedPath(path);
+    string splittedPath = splittedPair.first;
+    path = splittedPair.second;
     if (splittedPath.empty()) {
         mkfile(path, &fs.getRootDirectory(), fs, size, name);
         return;
@@ -334,9 +360,21 @@ void MvCommand::execute(FileSystem &fs) {
     pair<string, string> paths = getTwoPaths();
     string source = paths.first;
     string destination = paths.second;
-    BaseFile *sourceFile = getBaseFileByPath(source, &fs.getWorkingDirectory(), fs);
+    BaseFile *sourceFile;
+    if (source == "/")
+        sourceFile = &fs.getRootDirectory();
+    else
+        sourceFile = getBaseFileByPath(source, &fs.getWorkingDirectory(), fs);
     string sourceDirStr = removeLastPath(source);
-    BaseFile *sourceDir = getBaseFileByPath(sourceDirStr, &fs.getWorkingDirectory(), fs);
+    BaseFile *sourceDir;
+    if (sourceDirStr.empty())
+        sourceDir = &fs.getWorkingDirectory();
+    else {
+        if (sourceDirStr == "/")
+            sourceDir = &fs.getRootDirectory();
+        else
+            sourceDir = getBaseFileByPath(sourceDirStr, &fs.getWorkingDirectory(), fs);
+    }
     BaseFile *destDir = getBaseFileByPath(destination, &fs.getWorkingDirectory(), fs);
     if (!sourceDir || !destDir || !sourceFile || !destDir->getType()) {
         cout << "No such file or directory" << endl;
@@ -351,8 +389,12 @@ void MvCommand::execute(FileSystem &fs) {
     if (dynamic_cast<Directory *>(destDir)->getBaseFileByName(sourceFile->getName()))
         return;
     dynamic_cast<Directory *>(destDir)->getChildren().push_back(sourceFile);
-    auto it = dynamic_cast<Directory *>(sourceDir)->searchFileName(sourceFile->getName());
-    dynamic_cast<Directory *>(sourceDir)->getChildren().erase(it);
+    (dynamic_cast<Directory *>(sourceDir)->getChildren()).erase(
+            remove_if((dynamic_cast<Directory *>(sourceDir)->getChildren()).begin(),
+                      (dynamic_cast<Directory *>(sourceDir)->getChildren()).end(), [sourceFile](BaseFile *basefile)->bool{return
+                        basefile->getName() == sourceFile->getName();}));
+//    auto it = dynamic_cast<Directory *>(sourceDir)->searchFileName(sourceFile->getName());
+//    (dynamic_cast<Directory *>(sourceDir)->getChildren()).erase(it);
     if (sourceFile->getType()) {
         dynamic_cast<Directory *>(sourceFile)->setParent(dynamic_cast<Directory *>(destDir));
     }
@@ -368,15 +410,22 @@ void RenameCommand::execute(FileSystem &fs) {
     pair<string, string> paths = getTwoPaths();
     string source = paths.first;
     string newName = paths.second;
-    BaseFile *sourceFile = getBaseFileByPath(source, &fs.getWorkingDirectory(), fs);
+    BaseFile *sourceFile;
+    if (source == "/")
+        sourceFile = &fs.getRootDirectory();
+    else
+        sourceFile = getBaseFileByPath(source, &fs.getWorkingDirectory(), fs);
     string sourceDirStr = removeLastPath(source);
     BaseFile *sourceDir = getBaseFileByPath(sourceDirStr, &fs.getWorkingDirectory(), fs);
+    if (sourceDirStr == "/") {
+        sourceDir = &fs.getRootDirectory();
+    }
     if (!sourceDir || !sourceFile) {
         cout << "No such file or directory" << endl;
         msg = "No such file or directory";
         return;
     }
-    if (dynamic_cast<Directory *>(sourceDir)->getBaseFileByName(sourceFile->getName()))
+    if (dynamic_cast<Directory *>(sourceDir)->getBaseFileByName(newName))
         return;
     if (!checkParents(sourceFile, fs)) {
         cout << "Can't rename the working directory" << endl;
@@ -400,9 +449,13 @@ void RmCommand::execute(FileSystem &fs) {
     string sourceDirStr = removeLastPath(path);
     BaseFile *sourceDir;
     if (sourceDirStr.empty())
-        sourceDir =  &fs.getWorkingDirectory();
-    else
-        sourceDir = getBaseFileByPath(sourceDirStr, &fs.getWorkingDirectory(), fs);
+        sourceDir = &fs.getWorkingDirectory();
+    else {
+        if (sourceDirStr == "/")
+            sourceDir = &fs.getRootDirectory();
+        else
+            sourceDir = getBaseFileByPath(sourceDirStr, &fs.getWorkingDirectory(), fs);
+    }
     if (!sourceDir || !sourceFile) {
         cout << "No such file or directory" << endl;
         msg = "No such file or directory";
@@ -428,7 +481,7 @@ HistoryCommand::HistoryCommand(string args, const vector<BaseCommand *> &history
 
 void HistoryCommand::execute(FileSystem &fs) {
     for (size_t i = 0; i < history.size(), ++i;) {
-        if (history[i]->getArgs().find('$') != string::npos) {
+        if (history[i]->getArgs().find(' ') != string::npos) {
             pair<string, string> args = splitArgs(history[i]->getArgs());
             cout << i << "\t" << history[i]->toString() << " " << args.first << " " << args.second << endl;
             msg = std::to_string(i) + history[i]->toString() + " " + args.first + " " + args.second;

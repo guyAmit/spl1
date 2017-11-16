@@ -5,20 +5,21 @@
 #include "FileSystem.h"
 #include <iostream>
 #include "GlobalVariables.h"
-//todo::delete msg and change the public methods to protected
-static string msg;
+
 class BaseCommand {
 private:
     string args;
 public:
+//todo::delete msg and change the public methods to protected
+    string msg;
     /**
  *
  * @param path - the path to split
  * @return the substring until the first '/'.
  */
-    string getsplittedPath(string &path);
+    pair<string,string> getsplittedPath(string path);
 
-    BaseFile *getBaseFileByPath(string &path,Directory* current,FileSystem &fs);
+    BaseFile *getBaseFileByPath(string path,Directory* current,FileSystem &fs);
     /**
      * splits the args field (string) into two strings by '$'.
      *
@@ -82,7 +83,7 @@ public:
 //print the child vector
 class LsCommand : public BaseCommand {
 private:
-    void ls(string &path, Directory *current, FileSystem &fs, bool sortType);
+    void ls(string path, Directory *current, FileSystem &fs, bool sortType);
     void print(BaseFile &pFile);
 public:
     LsCommand(string args);
@@ -96,7 +97,7 @@ public:
 
 class MkdirCommand : public BaseCommand {
 private:
-    void mkdir(string &path, Directory *current, FileSystem &fs);
+    void mkdir(string path, Directory *current, FileSystem &fs);
 
 public:
     MkdirCommand(string args);
@@ -108,7 +109,7 @@ public:
 
 class MkfileCommand : public BaseCommand {
 private:
-    void mkfile(string &path, Directory *current, FileSystem &fs,int size,string &name);
+    void mkfile(string path, Directory *current, FileSystem &fs,int size,string &name);
 
 public:
     MkfileCommand(string args);

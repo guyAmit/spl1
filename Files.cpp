@@ -6,20 +6,20 @@
 
 //BaseFile class
 BaseFile::BaseFile(string name) : name("default") {
-        this->name = name;
+    this->name = name;
 }
 
 string BaseFile::getName() const { return name; }
 
 void BaseFile::setName(string newName) {
-        this->name = newName;
+    this->name = newName;
 }
 
 bool BaseFile::baseFile_Valid_Name(const string &name) {
     return (!name.empty() && name.find_first_not_of("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") ==
                              std::string::npos);
 }
-
+BaseFile::~BaseFile() {}
 //File class
 File::File(string name, int size) : BaseFile(name), size(0) {
     if (size < 0) {
@@ -32,6 +32,9 @@ File::File(string name, int size) : BaseFile(name), size(0) {
 int File::getSize() { return size; }
 
 bool File::getType() { return false; }
+
+ File::~File() {
+ }
 
 
 //Directory class
@@ -63,7 +66,7 @@ void Directory::addFile(BaseFile *file) {
 }
 
 //rule of 5
-Directory::~Directory() {
+ Directory::~Directory() {
     clean();
 }
 
@@ -129,7 +132,7 @@ vector<BaseFile *>::iterator Directory::searchFileName(string name) {
 void Directory::removeFile(string name) {
     auto iterator = searchFileName(name);
     if (!children.empty() && (iterator != children.end())) {
-        delete children.at(static_cast<unsigned long>(distance(children.begin(), iterator)));
+        delete *iterator;
         children.erase(iterator);
     }
 }
@@ -167,9 +170,13 @@ int Directory::getSize() {
 
 string Directory::getAbsolutePath() {
     if (!parent)
-        return "";
-    else
-        return parent->getAbsolutePath() + "/" + getName();
+        return getName();
+    else {
+        if (!(parent->getParent()))
+            return parent->getName() + getName();
+        else
+            return parent->getAbsolutePath() + "/" + getName();
+    }
 }
 
 bool Directory::getType() { return true; }

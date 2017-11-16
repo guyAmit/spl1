@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <iostream>
 
 using namespace std;
 
@@ -29,6 +30,7 @@ public:
      */
     virtual bool getType()=0;
     virtual int getSize() = 0;
+    virtual ~BaseFile()=0;
 
 
 };
@@ -42,6 +44,7 @@ public:
     //todo:: create positive test for size
     int getSize(); // Return the size of the file
     bool getType();
+    virtual ~File();
 
 };
 
