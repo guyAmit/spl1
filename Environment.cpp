@@ -49,3 +49,17 @@ void Environment::createCommand(const string &x, const string &y,const string &z
         rm.execute(fs);
     }
 }
+
+FileSystem &Environment::getFileSystem() {
+    return fs;
+}
+
+const vector<BaseCommand *> &Environment::getHistory() const {
+    return commandsHistory;
+}
+
+void Environment::addToHistory(BaseCommand *command) {
+    if (command) {
+        commandsHistory.push_back(command);
+    }
+}

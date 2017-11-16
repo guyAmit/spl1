@@ -388,15 +388,13 @@ void MvCommand::execute(FileSystem &fs) {
     }
     if (dynamic_cast<Directory *>(destDir)->getBaseFileByName(sourceFile->getName()))
         return;
-    dynamic_cast<Directory *>(destDir)->getChildren().push_back(sourceFile);
-    (dynamic_cast<Directory *>(sourceDir)->getChildren()).erase(
-            remove_if((dynamic_cast<Directory *>(sourceDir)->getChildren()).begin(),
-                      (dynamic_cast<Directory *>(sourceDir)->getChildren()).end(), [sourceFile](BaseFile *basefile)->bool{return
-                        basefile->getName() == sourceFile->getName();}));
-//    auto it = dynamic_cast<Directory *>(sourceDir)->searchFileName(sourceFile->getName());
-//    (dynamic_cast<Directory *>(sourceDir)->getChildren()).erase(it);
+    dynamic_cast<Directory *>(destDir)->addFile(sourceFile);
+    Directory *sourceDirCasted = dynamic_cast<Directory *>(sourceDir);
+    auto it = sourceDirCasted->searchFileName(sourceFile->getName());
+//    sourceDirCasted->getChildren().erase
+    sourceDirCasted->eraseByName(sourceFile->getName());
     if (sourceFile->getType()) {
-        dynamic_cast<Directory *>(sourceFile)->setParent(dynamic_cast<Directory *>(destDir));
+        sourceDirCasted->setParent(dynamic_cast<Directory *>(destDir));
     }
 }
 

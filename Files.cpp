@@ -184,8 +184,13 @@ bool Directory::getType() { return true; }
 BaseFile *Directory::getBaseFileByName(string name) {
     auto iterator = searchFileName(name);
     if (!children.empty() && (iterator != children.end()))
-        return children.at(static_cast<unsigned long>(distance(children.begin(), iterator)));
+        return *iterator;
     return nullptr;
+}
+void Directory::eraseByName(string name){
+    auto it = searchFileName(name);
+    if(it != children.end())
+    children.erase(it);
 }
 
 

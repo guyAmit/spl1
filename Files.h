@@ -101,6 +101,7 @@ public:
 
     BaseFile *getBaseFileByName(string name);
 
+    void eraseByName(string name);
 };
 
 #endif
