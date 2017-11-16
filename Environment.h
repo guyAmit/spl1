@@ -3,7 +3,7 @@
 
 #include "Files.h"
 #include "Commands.h"
-
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -20,7 +20,7 @@ public:
     FileSystem& getFileSystem() ; // Get a reference to the file system
     void addToHistory(BaseCommand *command); // Add a new command to the history
     const vector<BaseCommand*>& getHistory() const; // Return a reference to the history of commands
-    void createCommand(const string &x, const string &y,const string &z) ;
+    void createCommand(vector<string> inputStrings) ;
 };
 
 #endif

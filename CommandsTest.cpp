@@ -683,24 +683,24 @@ int levelTwoTests(FileSystem &sys) {
 /***********************************************************
  * main tests on level #2   *
  ************************************************************/
-int main(int, char **) {
-    int red1;
-    FileSystem *sys1 = new FileSystem();
-    red1 += rootTests(*sys1);
-    std::cout << "root level: red:" << red1 << "green:" << 11 - red1 << std::endl;
-    if (red1 > 0) {
-        throw std::exception();
-    }
-    delete sys1;
-    int red2 = 0;
-    FileSystem *sys2 = new FileSystem();
-    red2 += levelTwoTests(*sys2);
-    std::cout << "level 2: red:" << red1 << "green:" << 15 - red1 << std::endl;
-    if (red2 > 0) {
-        throw std::exception();
-    }
-
-
-}
+//int main(int, char **) {
+//    int red1;
+//    FileSystem *sys1 = new FileSystem();
+//    red1 += rootTests(*sys1);
+//    std::cout << "root level: red:" << red1 << "green:" << 11 - red1 << std::endl;
+//    if (red1 > 0) {
+//        throw std::exception();
+//    }
+//    delete sys1;
+//    int red2 = 0;
+//    FileSystem *sys2 = new FileSystem();
+//    red2 += levelTwoTests(*sys2);
+//    std::cout << "level 2: red:" << red1 << "green:" << 15 - red1 << std::endl;
+//    if (red2 > 0) {
+//        throw std::exception();
+//    }
+//
+//
+//}
 
 
