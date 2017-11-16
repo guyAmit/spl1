@@ -583,7 +583,7 @@ int lvl2RmTest3(FileSystem &sys) {
 
 /**Lvel2Test #13:: testing ls -s command on root"
  * @param sys
- * @pre root is now <dir1,dir4> and dir4 is <dir5> and dir1 is <file2,file3,dir2>, dir2 is <file2> working directory is root, dir2 is <>
+ * @pre root is now <dir1,dir4> and dir4 is <dir5> and dir1 is <file2,file3,dir2>, dir2 is <file2> working directory is root, dir2 is <file4>
  * @post root is now <dir1,dir4> and dir4 is <dir5> and dir1 is <file2,file3,dir2>, working directory is root, dir2 is <file2>
  * @return 1->test field 0->good
  */
