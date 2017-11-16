@@ -6,8 +6,6 @@
 #include "Files.h"
 #include "FileSystem.h"
 #include "Commands.h"
-#include "vector"
-#include "string"
 
 using namespace std;
 
@@ -202,7 +200,7 @@ int rmTest1(FileSystem &sys){
     RmCommand rm2("/Dir1");
     rm1.execute(sys);
     rm2.execute(sys);
-    if(sys.getRootDirectory().getChildren().size()!=0) {
+    if(!sys.getRootDirectory().getChildren().empty()) {
         std::cout<<"delete failed->root should be empty"<<std::endl;
         return 1;
     }
@@ -392,6 +390,7 @@ int lvl2CpTest1(FileSystem &sys){
     return 0;
 }
 
+
 /**Lvel2Test #6:: copying file1 from "/dir1" to "/dir2
  * @param sys
  * @pre root is <f1,dir1,dir2,dir3>, working directory is "/", dir1 is now <file2,file3>"
@@ -489,7 +488,7 @@ int lvl2MkDIrTest1(FileSystem &sys){
     return 0;
 }
 
-/**Lvel2Test #10:: trying to go inside dir3 whitch we have just deleted
+/**Level2Test #10:: trying to go inside dir3 whitch we have just deleted
  * @param sys
  * @pre root is <dir1,dir2,dir4>, working directory is "/", dir1 is now <file2,file3>
  * @post root is now <dir1,dir2,dir4> and dir4 is <dir5>
@@ -526,7 +525,7 @@ int lvl2MvTest1(FileSystem &sys){
         mv.execute(sys);
         cd.execute(sys);
         if (sys.getWorkingDirectory().getChildren().size()!=3) {
-            std::cout << "dir2 was not moved inside dir2 on lvl2MvTest1" << std::endl;
+            std::cout << "dir2 was not moved inside dir1 on lvl2MvTest1" << std::endl;
             return 1;
         }
         cd1.execute(sys);
@@ -541,6 +540,109 @@ int lvl2MvTest1(FileSystem &sys){
         std::cout<<"exception was thrown in lvl2MvTest1"<<std::endl;
         return 1;
     }
+
+    return 0;
+}
+
+
+/**Lvel2Test #12:: removing file4 from "/dir1/dir2/"
+ * @param sys
+ * @pre root is <dir2,dir4>, working directory is "/", dir1 is now <file2,file3,dir2>
+ * @post root is now <dir1,dir4> and dir4 is <dir5> and dir1 is <file2,file3,dir2>, working directory is root, dir2 is <>
+ * @return 1->test field 0->good
+ */
+int lvl2RmTest3(FileSystem &sys){
+    RmCommand rm("/dir1/dir2/file4");
+    CdCommand cd1("/dir1/dir2");
+    CdCommand cd2("..");
+    try {
+        rm.execute(sys);
+        cd1.execute(sys);
+        if (!sys.getWorkingDirectory().getChildren().empty()) {
+            std::cout << "file4 was not removed from dir2 on lvl2RmTest3" << std::endl;
+            return 1;
+        }
+        cd1.execute(sys);
+        cd2.execute(sys);
+        cd2.execute(sys);
+    }
+    catch(std::exception) {
+        std::cout<<"exception was thrown in lvl2RmTest3"<<std::endl;
+        return 1;
+    }
+    return 0;
+}
+
+
+/**Lvel2Test #13:: testing ls -s command on root"
+ * @param sys
+ * @pre root is now <dir1,dir4> and dir4 is <dir5> and dir1 is <file2,file3,dir2>, working directory is root, dir2 is <>
+ * @post root is now <dir1,dir4> and dir4 is <dir5> and dir1 is <file2,file3,dir2>, working directory is root, dir2 is <>
+ * @return 1->test field 0->good
+ */
+int lvl2LsTest1(FileSystem &sys){
+    LsCommand ls("ls -s");
+    try {
+        ls.execute(sys);
+        if (ls.msg!="DIR\tdir1\t250\nDIR\tdir4\t0") {
+            std::cout << "ls -s did not print the correct msg on lvl2LsTest1"<< std::endl;
+            return 1;
+        }
+    }
+    catch(std::exception) {
+        std::cout<<"exception was thrown in lvl2LsTest1"<<std::endl;
+        return 1;
+    }
+    return 0;
+}
+
+/**Lvel2Test #14:: removing dir1 from root
+ * @param sys
+ * @pre root is now <dir1,dir4> and dir4 is <dir5> and dir1 is <file2,file3,dir2>, working directory is root, dir2 is <>
+ * @post root is now <dir4> and dir4 is <dir5> , working directory is root
+ * @return 1->test field 0->good
+ */
+int lvl2RmTest4(FileSystem &sys){
+    RmCommand rm("/dir1");
+    LsCommand ls("ls -s");
+    try {
+        rm.execute(sys);
+        if (sys.getWorkingDirectory().getChildren().size()!=1) {
+            std::cout << "dir2 was not deleted from root on lvl2RmTest4"<< std::endl;
+            return 1;
+        }
+        ls.execute(sys);
+        if(ls.msg!="DIR\tdir4\t0"){
+            std::cout << "dir2 was not deleted from root on lvl2RmTest4"<< std::endl;
+            return 1;
+        }
+    }
+    catch(std::exception) {
+        std::cout<<"exception was thrown in lvl2RmTest4"<<std::endl;
+        return 1;
+    }
+    return 0;
+}
+
+/**Lvel2Test #15:: removing the last folder from root
+ * @param sys
+ * @pre root is now <dir4> and dir4 is <dir5> , working directory is root
+ * @post root is now empty
+ * @return 1->test field 0->good
+ */
+int lvl2RmTest5(FileSystem &sys){
+    RmCommand rm("/dir4");
+    try {
+        rm.execute(sys);
+        if (!sys.getWorkingDirectory().getChildren().empty()) {
+            std::cout << "dir4 was not deleted from root on lvl2RmTest5"<< std::endl;
+            return 1;
+        }
+    }
+    catch(std::exception) {
+        std::cout<<"exception was thrown in lvl2RmTest5"<<std::endl;
+        return 1;
+    }
     return 0;
 }
 /***************************************************************************/
@@ -553,11 +655,16 @@ int levelTwoTests(FileSystem &sys){
     counter+=lvl2CdTest2(sys);
     counter+=lvl2MkFileTest3(sys);
     counter+=lvl2CpTest1(sys);
+    counter+=lvl2CpTest2(sys);
     counter+=lvl2RmTest1(sys);
     counter+=lvl2RmTest2(sys);
     counter+=lvl2MkDIrTest1(sys);
     counter+=lvl2CdTest3(sys);
     counter+=lvl2MvTest1(sys);
+    counter+=lvl2RmTest3(sys);
+    counter+=lvl2LsTest1(sys);
+    counter+=lvl2RmTest4(sys);
+    counter+=lvl2RmTest5(sys);
     return counter;
 }
 /***********************************************************
@@ -576,7 +683,7 @@ int main(int main(int , char **)){
     int red2=0;
     FileSystem *sys2 = new FileSystem();
     red2+=levelTwoTests(*sys2);
-    std::cout<<"level 2: red:"<<red1<<"green:"<<11-red1<<std::endl;
+    std::cout<<"level 2: red:"<<red1<<"green:"<<15-red1<<std::endl;
     if(red2>0){
         throw std::exception();
     }
