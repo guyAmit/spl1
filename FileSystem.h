@@ -2,6 +2,7 @@
 #define FILESYSTEM_H_
 
 #include "Files.h"
+#include "GlobalVariables.h"
 
 
 class FileSystem {
@@ -24,7 +25,7 @@ public:
     FileSystem &operator=(const FileSystem  &rhs);
     FileSystem &operator=(FileSystem &&rhs);
     FileSystem(const FileSystem &rhs);
-    ~FileSystem();
+    virtual ~FileSystem();
     FileSystem(FileSystem &&rhs);
 
 };

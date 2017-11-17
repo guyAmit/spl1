@@ -5,27 +5,32 @@
 #include "Environment.h"
 
 Environment::Environment() {
-    vector<BaseCommand *> *commandsHistory=new vector<BaseCommand*>();
-    FileSystem *fs = new FileSystem();
+    vector<BaseCommand *> *commandsHistory = new vector<BaseCommand *>();
+    FileSystem fs;
 }
 
 void Environment::start() {
     string line;
     vector<string> inputStrings;
     string string1;
-    cout << fs.getWorkingDirectory().getName()<< '>';
+    cout << fs.getWorkingDirectory().getName() << '>';
     getline(cin, line);
     istringstream iss(line);
     while (iss >> string1) {
         inputStrings.push_back(string1);
     }
-    while (inputStrings[0] != "exit") {
-        createCommand(inputStrings);
-        cout << fs.getWorkingDirectory().getName()<< '>';
+    while (inputStrings.empty() || inputStrings[0] != "exit") {
+        if (!inputStrings.empty()) {
+            if (verbose == 2 || verbose == 3) {
+                cout << line << endl;
+            }
+            createCommand(inputStrings);
+        }
+        cout << fs.getWorkingDirectory().getName() << '>';
         inputStrings.clear();
         getline(cin, line);
         istringstream iss(line);
-        for(string string1; iss >>string1; inputStrings.push_back(string1));
+        for (string string1; iss >> string1; inputStrings.push_back(string1));
     }
 
 
@@ -39,45 +44,45 @@ void Environment::createCommand(vector<string> inputStrings) {
     if (inputStrings.size() > 1) {
         y = inputStrings[1];
     }
-    if(inputStrings.size()>2) {
+    if (inputStrings.size() > 2) {
         z = inputStrings[2];
     }
-    if ( x== "ls") {
+    if (x == "ls") {
         string args = y + ' ' + z;
-        LsCommand* ls=new LsCommand(args);
+        LsCommand *ls = new LsCommand(args);
         ls->execute(fs);
         addToHistory(ls);
         return;
     }
     if (x == "mkdir") {
-        MkdirCommand* mkdir=new MkdirCommand(y);
+        MkdirCommand *mkdir = new MkdirCommand(y);
         mkdir->execute(fs);
         addToHistory(mkdir);
         return;
     }
     if (x == "mkfile") {
         string args = y + ' ' + z;
-        MkfileCommand *mkfile=new MkfileCommand(args);
+        MkfileCommand *mkfile = new MkfileCommand(args);
         mkfile->execute(fs);
         addToHistory(mkfile);
         return;
     }
-    if(x=="cd") {
+    if (x == "cd") {
         string args = y;
-        CdCommand* cd=new CdCommand(args);
+        CdCommand *cd = new CdCommand(args);
         cd->execute(fs);
         addToHistory(cd);
         return;
     }
     if (x == "rm") {
         string args = y;
-        RmCommand* rm=new RmCommand(args);
+        RmCommand *rm = new RmCommand(args);
         rm->execute(fs);
         addToHistory(rm);
         return;
     }
     if (x == "pwd") {
-        PwdCommand* pwd = new PwdCommand("");
+        PwdCommand *pwd = new PwdCommand("");
         pwd->execute(fs);
         addToHistory(pwd);
         return;
@@ -88,13 +93,13 @@ void Environment::createCommand(vector<string> inputStrings) {
         addToHistory(cp);
         return;
     }
-    if(x=="mv") {
+    if (x == "mv") {
         MvCommand *mv = new MvCommand(y + ' ' + z);
         mv->execute(fs);
         addToHistory(mv);
         return;
     }
-    if(x=="rename") {
+    if (x == "rename") {
         RenameCommand *rename = new RenameCommand(y + ' ' + z);
         rename->execute(fs);
         addToHistory(rename);
@@ -107,20 +112,20 @@ void Environment::createCommand(vector<string> inputStrings) {
         return;
     }
     if (x == "verbose") {
-        VerboseCommand* verbose =new VerboseCommand(y);
+        VerboseCommand *verbose = new VerboseCommand(y);
         verbose->execute(fs);
         addToHistory(verbose);
         return;
     }
     if (x == "exec") {
-        ExecCommand *exec = new ExecCommand("y", commandsHistory);
+        ExecCommand *exec = new ExecCommand(y, commandsHistory);
         exec->execute(fs);
         addToHistory(exec);
         return;
     }
-        ErrorCommand* error = new ErrorCommand(x);
-        error->execute(fs);
-        addToHistory(error);
+    ErrorCommand *error = new ErrorCommand(x);
+    error->execute(fs);
+    addToHistory(error);
 
 }
 
@@ -136,4 +141,66 @@ void Environment::addToHistory(BaseCommand *command) {
     if (command) {
         commandsHistory.push_back(command);
     }
+}
+
+//rule of 5 methods
+void Environment::clean() const {
+    for (auto command :commandsHistory) {
+        delete command;
+    }
+}
+
+void Environment::copy(const Environment &rhs) {
+    this->fs = rhs.fs;
+    for (auto command :rhs.commandsHistory) {
+        this->commandsHistory.push_back(command);
+    }
+}
+
+void Environment::steal(Environment &rhs) {
+    this->fs = rhs.fs;
+    this->commandsHistory = rhs.commandsHistory;
+    rhs.commandsHistory.clear();
+}
+
+Environment::~Environment() {
+    if (verbose == 1 || verbose == 3) {
+        cout << "Environment::~Environment()" << endl;
+    }
+    clean();
+
+}
+
+Environment::Environment(const Environment &rhs) {
+    if (verbose == 1 || verbose == 3) {
+        cout << "Environment::Environment(const Environment &rhs)" << endl;
+    }
+    copy(rhs);
+}
+
+Environment &Environment::operator=(const Environment &rhs) {
+    if (verbose == 1 || verbose == 3) {
+        cout << "Environment &Environment::operator=(const Environment &rhs)" << endl;
+    }
+    if (this != &rhs) {
+        clean();
+        copy(rhs);
+    }
+    return *this;
+}
+
+Environment &Environment::operator=(Environment &&rhs) {
+    if (verbose == 1 || verbose == 3) {
+        cout << "Environment &Environment::operator=(Environment &&rhs)" << endl;
+    }
+    clean();
+    steal(rhs);
+    return *this;
+}
+
+Environment::Environment(Environment &&rhs) {
+    if (verbose == 1 || verbose == 3) {
+        cout << "Environment::Environment(Environment &&rhs)" << endl;
+    }
+    steal(rhs);
 }

@@ -5,6 +5,7 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include "GlobalVariables.h"
 
 using namespace std;
 
@@ -75,7 +76,6 @@ public:
     void removeFile(BaseFile *file); // Remove the file from children
 
 
-    //todo:: import a generic sort algortim
     void sortByName(); // Sort children by name alphabetically (not recursively)
 
 

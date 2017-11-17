@@ -113,9 +113,10 @@ CdCommand::CdCommand(string args) : BaseCommand(args) {
 }
 
 void CdCommand::cd(string &path, Directory *current, FileSystem &fs) {
-    if (!current && !path.empty()) {
+    if (!current) {
         cout << "The system cannot find the path specified" << endl;
         msg = "The system cannot find the path specified";
+        return;
     }
     if (path.empty()) {
         fs.setWorkingDirectory(current);
@@ -202,7 +203,7 @@ void LsCommand::print(BaseFile &pFile) {
     else
         type = "FILE";
     cout << type << "\t" << pFile.getName() << "\t" << pFile.getSize() << endl;
-    msg += type + "\t" + pFile.getName() + "\t" + std::to_string(pFile.getSize())+"\n";
+    msg += type + "\t" + pFile.getName() + "\t" + std::to_string(pFile.getSize()) + "\n";
 }
 
 string LsCommand::toString() {
@@ -331,7 +332,6 @@ void CpCommand::execute(FileSystem &fs) {
     BaseFile *sourceFile = getBaseFileByPath(source, &fs.getWorkingDirectory(), fs);
     BaseFile *destDirectory = getBaseFileByPath(destination, &fs.getWorkingDirectory(), fs);
     if (sourceFile && destDirectory && destDirectory->getType()) {
-        //todo:: check if dest is a child of source
         addcopyFile(sourceFile, destDirectory);
         return;
     }
@@ -341,7 +341,9 @@ void CpCommand::execute(FileSystem &fs) {
 
 void CpCommand::addcopyFile(BaseFile *sourceFile, BaseFile *destDirectory) {
     if (sourceFile->getType()) {
-        (dynamic_cast<Directory *>(destDirectory))->addFile(new Directory(*dynamic_cast<Directory *>(sourceFile)));
+        Directory *newDirectory = new Directory(*dynamic_cast<Directory *>(sourceFile));
+        newDirectory->setParent(dynamic_cast<Directory *>(destDirectory));
+        (dynamic_cast<Directory *>(destDirectory))->addFile(newDirectory);
     } else {
         (dynamic_cast<Directory *>(destDirectory))->addFile(new File(sourceFile->getName(), sourceFile->getSize()));
 
@@ -473,7 +475,8 @@ HistoryCommand::HistoryCommand(string args, const vector<BaseCommand *> &history
 }
 
 void HistoryCommand::execute(FileSystem &fs) {
-    for (size_t i = 0; i < history.size(), ++i;) {
+    int i = 0;
+    while (i < history.size()) {
         if (history[i]->getArgs().find(' ') != string::npos) {
             pair<string, string> args = splitArgs(history[i]->getArgs());
             cout << i << "\t" << history[i]->toString() << " " << args.first << " " << args.second << endl;
@@ -483,6 +486,7 @@ void HistoryCommand::execute(FileSystem &fs) {
             msg = std::to_string(i) + history[i]->toString() + " " + history[i]->getArgs();
 
         }
+        i = i + 1;
     }
 }
 

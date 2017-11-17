@@ -67,15 +67,24 @@ void Directory::addFile(BaseFile *file) {
 
 //rule of 5
  Directory::~Directory() {
+    if(verbose==1 ||verbose==3){
+        cout << "Directory::~Directory()" << endl;
+    }
     clean();
 }
 
 Directory::Directory(const Directory &rhs) : BaseFile("default") {
+    if(verbose==1 ||verbose==3){
+        cout << "Directory::Directory(const Directory &rhs)" << endl;
+    }
     copy(rhs);
 }
 
 
 Directory &Directory::operator=(const Directory &rhs) {
+    if(verbose==1 ||verbose==3){
+        cout << "Directory &Directory::operator=(const Directory &rhs)" << endl;
+    }
     if (this != &rhs) {
         clean();
         copy(rhs);
@@ -84,10 +93,16 @@ Directory &Directory::operator=(const Directory &rhs) {
 }
 
 Directory::Directory(Directory &&rhs) : BaseFile("default") {
+    if(verbose==1 ||verbose==3){
+        cout << "Directory::Directory(Directory &&rhs)" << endl;
+    }
     steal(rhs);
 }
 
 Directory &Directory::operator=(Directory &&rhs) {
+    if(verbose==1 ||verbose==3){
+        cout << "Directory &Directory::operator=(Directory &&rhs)" << endl;
+    }
     clean();
     steal(rhs);
     return *this;
@@ -101,14 +116,15 @@ void Directory::steal(Directory &rhs) {
 }
 
 void Directory::copy(const Directory &rhs) {
-    this->parent = rhs.parent;
     this->setName(rhs.getName());
     this->children;
     for (auto baseFile:rhs.children) {
         if (!baseFile->getType())
             children.push_back(new File(baseFile->getName(), baseFile->getSize()));
         else {
-            children.push_back(new Directory(*dynamic_cast<Directory * >(baseFile)));
+            Directory *newDirectory = new Directory(*dynamic_cast<Directory * >(baseFile));
+            newDirectory->parent = this;
+            children.push_back(dynamic_cast<BaseFile*>(newDirectory));
         }
     }
 

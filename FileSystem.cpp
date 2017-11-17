@@ -27,7 +27,7 @@ void FileSystem::setWorkingDirectory(Directory *newWorkingDirectory) {
     else{throw std::exception();}
 }
 /************************************************
-for test perpesese only::implamention of rule of 5
+implemention of rule of 5
  there should be only one file system.
 *************************************************/
 
@@ -49,23 +49,38 @@ void FileSystem::steal(FileSystem &rhs) {
 }
 
 FileSystem::FileSystem(const FileSystem &rhs) {
+    if(verbose==1 ||verbose==3){
+        cout << "FileSystem::FileSystem(const FileSystem &rhs)" << endl;
+    }
     copy(rhs);
 }
 
 FileSystem::FileSystem(FileSystem &&rhs) {
+    if(verbose==1 ||verbose==3){
+        cout << "FileSystem::FileSystem(FileSystem &&rhs)" << endl;
+    }
     steal(rhs);
 }
 FileSystem::~FileSystem() {
+    if(verbose==1 ||verbose==3){
+        cout << "FileSystem::~FileSystem()" << endl;
+    }
     clean();
 }
 
 FileSystem& FileSystem::operator=(FileSystem &&rhs) {
-    clean();
-    steal(rhs);
+    if(verbose==1 ||verbose==3){
+        cout << "FileSystem& FileSystem::operator=(FileSystem &&rhs)" << endl;
+    }
+        clean();
+        steal(rhs);
     return *this;
 }
 
 FileSystem& FileSystem::operator=(const FileSystem &rhs) {
+    if(verbose==1 ||verbose==3){
+        cout << "FileSystem& FileSystem::operator=(const FileSystem &rhs)" << endl;
+    }
     if(this != &rhs){
         clean();
         copy(rhs);
