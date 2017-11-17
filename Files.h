@@ -54,7 +54,7 @@ private:
     vector<BaseFile *> children; //this is a list of both files and folders
     Directory *parent;
 
-    void clean() const;
+    void clean();
 
     void copy(const Directory &rhs);
 

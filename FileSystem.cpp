@@ -31,8 +31,9 @@ implemention of rule of 5
  there should be only one file system.
 *************************************************/
 
-void FileSystem::clean() const {
+void FileSystem::clean()  {
     delete this->rootDirectory;
+    this->workingDirectory = nullptr;
 }
 
 void FileSystem::copy(const FileSystem &rhs) {

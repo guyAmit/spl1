@@ -130,7 +130,7 @@ void Directory::copy(const Directory &rhs) {
 
 }
 
-void Directory::clean() const {
+void Directory::clean() {
     for (auto baseFile :children) {
         delete baseFile;
     }

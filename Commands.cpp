@@ -451,13 +451,17 @@ void RmCommand::execute(FileSystem &fs) {
         else
             sourceDir = getBaseFileByPath(sourceDirStr, &fs.getWorkingDirectory(), fs);
     }
+    if(sourceDirStr=="/"&&path=="/") {
+        cout << "Can't remove directory" << endl;
+        return;
+    }
     if (!sourceDir || !sourceFile) {
         cout << "No such file or directory" << endl;
         msg = "No such file or directory";
         return;
     }
     if (!checkParents(sourceFile, fs)) {
-        cout << "Can't remove the working directory" << endl;
+        cout << "Can't remove directory" << endl;
         msg = "Can't remove the working directory";
         return;
     }

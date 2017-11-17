@@ -14,7 +14,7 @@ private:
     vector<BaseCommand*> commandsHistory;
     FileSystem fs;
     //rule of 5 methods
-    void clean() const ;
+    void clean() ;
     void steal(Environment &rhs);
     void copy(const Environment &rhs);
 

@@ -11,7 +11,7 @@ private:
     Directory* workingDirectory;
 
     //rule of 5 methods
-    void clean() const ;
+    void clean()  ;
     void steal(FileSystem &rhs);
     void copy(const FileSystem &rhs);
 

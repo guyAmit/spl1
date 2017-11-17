@@ -5,7 +5,7 @@
 #include "Environment.h"
 
 Environment::Environment() {
-    vector<BaseCommand *> *commandsHistory = new vector<BaseCommand *>();
+    vector<BaseCommand *> commandsHistory;
     FileSystem fs;
 }
 
@@ -13,7 +13,7 @@ void Environment::start() {
     string line;
     vector<string> inputStrings;
     string string1;
-    cout << fs.getWorkingDirectory().getName() << '>';
+    cout << fs.getWorkingDirectory().getAbsolutePath() << '>';
     getline(cin, line);
     istringstream iss(line);
     while (iss >> string1) {
@@ -26,7 +26,7 @@ void Environment::start() {
             }
             createCommand(inputStrings);
         }
-        cout << fs.getWorkingDirectory().getName() << '>';
+        cout << fs.getWorkingDirectory().getAbsolutePath() << '>';
         inputStrings.clear();
         getline(cin, line);
         istringstream iss(line);
@@ -144,7 +144,7 @@ void Environment::addToHistory(BaseCommand *command) {
 }
 
 //rule of 5 methods
-void Environment::clean() const {
+void Environment::clean() {
     for (auto command :commandsHistory) {
         delete command;
     }
