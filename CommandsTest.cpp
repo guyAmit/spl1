@@ -3,9 +3,9 @@
 //
 
 #include <iostream>
-#include "Files.h"
-#include "FileSystem.h"
-#include "Commands.h"
+#include "include/Files.h"
+#include "include/FileSystem.h"
+#include "include/Commands.h"
 
 using namespace std;
 
@@ -211,14 +211,63 @@ int rmTest1(FileSystem &sys) {
 }
 
 
-/**RootTest #11::history check
+/**RootTest #12:: trying to create a in "/.."
  * @param sys
  * @pre root contain two files: <dir1,file1>
  * @post root is now empty
  * @return 1->test field 0->good
  */
-int historyTest1(FileSystem &sys) {
-    //Todo:: find a way to implament
+int mkDirTest2(FileSystem &sys) {
+    MkdirCommand mkdir("/..");
+    try{
+        mkdir.execute(sys);
+        if(mkdir.msg!="The system cannot find the path specified"){
+            std::cout<<"can not create a folder inside the root parnt on mkDirTest2"<<std::endl;
+            return 1;
+        }
+    }catch (std::exception){
+        std::cout<<"exception was thrown in mkDirTest2"<<std::endl;
+    }
+    return 0;
+}
+
+/**RootTest #13:: relative path tests
+ * @param sys
+ * @pre root contain two files: <dir1,file1>
+ * @post root is now <dir>
+ * @return 1->test field 0->good
+ */
+int relativePathTest(FileSystem &sys) {
+    MkdirCommand mkdir1("/dir");
+    MkfileCommand mkf("file 100");
+    RmCommand rm("file");
+    CdCommand cd("/dir");
+    CdCommand cd1("..");
+    try{
+        mkdir1.execute(sys);
+        if(sys.getWorkingDirectory().getChildren()[0]->getName()!="dir"){
+            std::cout<<"the directory dir was not created on relativePathTest"<<std::endl;
+            return 1;
+        }
+        cd.execute(sys);
+        if(sys.getWorkingDirectory().getName()!="dir"){
+            std::cout<<"cd command did not work in relativePathTest"<<std::endl;
+            return 1;
+        }
+        mkf.execute(sys);
+        if(sys.getWorkingDirectory().getChildren().size()!=1){
+            std::cout<<"the file 'file' was not created  in 'dir' on relativePathTest"<<std::endl;
+            return 1;
+        }
+        rm.execute(sys);
+        if(!sys.getWorkingDirectory().getChildren().empty()){
+            std::cout<<"the file 'file' was not removed on relativePathTest"<<std::endl;
+            return 1;
+        }
+        cd1.execute(sys);
+    }catch (std::exception){
+        std::cout<<"exception was thrown in mkDirTest2"<<std::endl;
+    }
     return 0;
 }
 
@@ -235,7 +284,8 @@ int rootTests(FileSystem &sys) {
     counter += renameTest2(sys);
     counter += renameTest3(sys);
     counter += rmTest1(sys);
-    //  counter += historyTest1(sys);
+    counter += mkDirTest2(sys);
+    counter+=relativePathTest(sys);
     return counter;
 }
 
@@ -287,7 +337,7 @@ int lvl2CdTest1(FileSystem &sys) {
  * @return 1->test field 0->good
  */
 int lvl2MkFileTest1(FileSystem &sys) {
-    MkfileCommand mk("/dir1/file2 100");
+    MkfileCommand mk("file2 100");
     try {
         mk.execute(sys);
         if (sys.getWorkingDirectory().getChildren().size() != 1) {
@@ -305,11 +355,11 @@ int lvl2MkFileTest1(FileSystem &sys) {
 /**Lvel2Test #3:: making a new file inside dir1 from inside the folder dir1
  * @param sys
  * @pre root is <f1,dir1,dir2,dir3>, working directory is "/dir1, dir1 is now <file2>"
- * @post dir1 has changed to <file2>
+ * @post dir1 has changed to <file2,file3>
  * @return 1->test field 0->good
  */
 int lvl2MkFileTest2(FileSystem &sys) {
-    MkfileCommand mk("/dir1/file3 150");
+    MkfileCommand mk("file3 150");
     try {
         mk.execute(sys);
         if (sys.getWorkingDirectory().getChildren().size() != 2) {
@@ -678,20 +728,283 @@ int levelTwoTests(FileSystem &sys) {
     return counter;
 }
 
+
 /***********************************************************
- * main tests on level #2   *
+ *  tests on level #3   *
+ *  assuiming level 2 passed
  ************************************************************/
+
+
+
+/**Lvel3Test #1:: creating the path "/dir3/dir4/dir5"
+ * @param sys
+ * @pre root is now <f1,f3,dir1> , dir1 is <dir2>
+ * @post root root is <f1,f3,dir1,dir3>, dir1 is <dir2>, dir3 is <dir4> ,dir4 is <dir5>
+ * @return 1->test field 0->good
+ */
+int lvl3MkDirTest1(FileSystem &sys) {
+    MkdirCommand mk("/dir3/dir4/dir5");
+    CdCommand cd1("/dir3/dir4");
+    CdCommand cd2("..");
+    try {
+        mk.execute(sys);
+        cd1.execute(sys);
+        if (sys.getWorkingDirectory().getChildren().size()!=1) {
+            std::cout << "something want wrong on creating the path \"/dir3/dir4/dir5\" on lvl3MkDirTest1" << std::endl;
+            return 1;
+        }
+    }
+    catch (std::exception) {
+        std::cout << "exception was thrown in lvl3MkDirTest1" << std::endl;
+        return 1;
+    }
+    cd2.execute(sys);
+    cd2.execute(sys);
+    return 0;
+}
+
+/**Lvel3Test #2:: creating the file "/dir1/dir2/f2"
+ * @param sys
+ * @pre root is now <f1,f3,dir1,di3> , dir1 is <dir2> ,dir3 is <dir4>
+ * @post root root is <f1,f3,dir1,dir3>, dir1 is <dir2>, dir3 is <dir4> ,dir4 is <dir5>
+ * @return 1->test field 0->good
+ */
+int lvl3MkFileTest1(FileSystem &sys) {
+    MkdirCommand mk("/dir1/dir2/f2 150");
+    CdCommand cd1("/dir1/dir2");
+    CdCommand cd2("..");
+    try {
+        mk.execute(sys);
+        cd1.execute(sys);
+        if (sys.getWorkingDirectory().getChildren().size()!=1) {
+            std::cout << "something want wrong on creating the file /dir1/dir2/f2 on lvl3MkFileTest1" << std::endl;
+            return 1;
+        }
+    }
+    catch (std::exception) {
+        std::cout << "exception was thrown in lvl3MkFileTest1" << std::endl;
+        return 1;
+    }
+    cd2.execute(sys);
+    cd2.execute(sys);
+    return 0;
+}
+
+/**Lvel3Test #3:: ls test on root
+ * @param sys
+ * @pre root is now <f1,f3,dir1,dir3> , dir1 is <dir2>, dir3 is <dir4>, dir4 is <dir5>
+ * @post root root is <f1,f3,dir1,dir3>, dir1 is <dir2>, dir3 is <dir4> ,dir4 is <dir5>
+ * @return 1->test field 0->good
+ */
+int lvl3lsTest1(FileSystem &sys) {
+    LsCommand ls("-s /");
+    try {
+        ls.execute(sys);
+        if (ls.msg.substr(0,60)!="DIR\tdir1\t150\nFILE\tf1\t100\nFILE\tf3\t100\nDIR\tdir3\t0\n" ) {
+            std::cout << "something want wrong on lvl3lsTest1" << std::endl;
+            return 1;
+        }
+    }
+    catch (std::exception) {
+        std::cout << "exception was thrown in lvl3MkFileTest1" << std::endl;
+        return 1;
+    }
+    return 0;
+}
+
+/**Lvel3Test #4:: moving /dir3 inside /dir1
+ * @param sys
+ * @pre root is now <f1,f3,dir1> , dir1 is <dir2> dir3 is <dir4>
+ * @post root root is <f1,f3,dir1>, dir1 is <dir2,dir3>, dir3 is <dir4> ,dir4 is <dir5> dir2 is <f2>
+ * @return 1->test field 0->good
+ */
+int lvl3MvTest1(FileSystem &sys) {
+    MvCommand mv("/dir3 /dir1");
+    CdCommand cd0("/dir3");
+    CdCommand cd1("/dir1/dir3/dir4/dir5");
+    CdCommand cd2("..");
+    try {
+        mv.execute(sys);
+        cd0.execute(sys);
+        if(cd0.msg!="The system cannot find the path specified"){
+            std::cout << "the directory dir3 was not moved from root on lvl3MvTest1" << std::endl;
+            return 1;
+        }
+        cd1.execute(sys);
+        if (!sys.getWorkingDirectory().getChildren().empty()) {
+            std::cout << "something want wrong on lvl3MvTest1" << std::endl;
+            return 1;
+        }
+    }
+    catch (std::exception) {
+        std::cout << "exception was thrown in lvl3MvTest1" << std::endl;
+        return 1;
+    }
+    cd2.execute(sys);
+    cd2.execute(sys);
+    return 0;
+}
+
+/**Lvel3Test #5:: removing dir5 from dir4
+ * @param sys
+ * @pre root root is <f1,f3,dir1>, dir1 is <dir2,dir3>, dir3 is <dir4> ,dir4 is <dir5>, dir2 is <f2>
+ * @post root root is <f1,f3,dir1>, dir1 is <dir2,dir3>, dir3 is <dir4> ,dir4 is <>, dir2 is <f2>
+ * @return 1->test field 0->good
+ */
+int lvl3RmTest1(FileSystem &sys) {
+    RmCommand rm("/dir1/dir3/dir4/dir5");
+    CdCommand cd0("/dir1/dir3/dir4/dir5");
+    CdCommand cd1("/dir1/dir3/dir4");
+    CdCommand cd2("..");
+    try {
+        rm.execute(sys);
+        cd0.execute(sys);
+        if(cd0.msg!="The system cannot find the path specified"){
+            std::cout << "the directory dir5 was not removed from dir4 on lvl3RmTest1" << std::endl;
+            return 1;
+        }
+        cd1.execute(sys);
+        if (!sys.getWorkingDirectory().getChildren().empty()) {
+            std::cout << "something want wrong on lvl3RmTest1" << std::endl;
+            return 1;
+        }
+    }
+    catch (std::exception) {
+        std::cout << "exception was thrown in lvl3RmTest1" << std::endl;
+        return 1;
+    }
+    cd2.execute(sys);
+    cd2.execute(sys);
+    cd2.execute(sys);
+    return 0;
+}
+
+
+/**Lvel3Test #5:: removing dir1 from root in order to create a memory leak
+ * @param sys
+ * @pre root is <f1,f3,dir1>, dir1 is <dir2,dir3>, dir3 is <dir4> ,dir4 is <>,dir2 is <f2>
+ * @post root is <f1,f3>
+ * @return 1->test field 0->good
+ */
+int lvl3RmTest2(FileSystem &sys) {
+    RmCommand rm("/dir1");
+    CdCommand cd1("/dir1/dir3/dir4");
+    CdCommand cd0("/");
+    LsCommand ls("/");
+    try {
+        cd0.execute(sys);
+        rm.execute(sys);
+        ls.execute(sys);
+        if(ls.msg!="FILE\tf1\t100\nFILE\tf3\t100\n" && ls.msg!="FILE\tf3\t100\nFIle\tf1\t100\n"){
+            std::cout << "the directory dir1 was not removed from dir4 on lvl3RmTest2" << std::endl;
+            return 1;
+        }
+        cd1.execute(sys);
+        if (cd1.msg!="The system cannot find the path specified") {
+            std::cout << "the deletion failed lvl3RmTest2" << std::endl;
+            return 1;
+        }
+    }
+    catch (std::exception) {
+        std::cout << "exception was thrown in lvl3RmTest2" << std::endl;
+        return 1;
+    }
+    return 0;
+}
+
+/**Lvel3Test #6:: trying to copy a file into a file -> should fail
+ * @param sys
+ * @pre root is <f1,f3>
+ * @post root is <f1,f3>
+ * @return 1->test field 0->good
+ */
+int lvl3CpTest1(FileSystem &sys) {
+    CpCommand cp("/f1 /f3");
+    try {
+        cp.execute(sys);
+        if(cp.msg!="No such file or directory"){
+            std::cout << "can't copy a file into a file in lvl3CpTest1" << std::endl;
+            return 1;
+        }
+    }
+    catch (std::exception) {
+        std::cout << "exception was thrown in lvl3CpTest1" << std::endl;
+        return 1;
+    }
+    return 0;
+}
+
+/**Lvel3Test #7:: trying to move a file into a file -> should fail
+ * @param sys
+ * @pre root is <f1,f3>
+ * @post root is <f1,f3>
+ * @return 1->test field 0->good
+ */
+int lvl3MvTest2(FileSystem &sys) {
+    MvCommand mv("/f1 /f3");
+    try {
+        mv.execute(sys);
+        if(mv.msg!="No such file or directory"){
+            std::cout << "can't move a file into a file in lvl3MvTest2" << std::endl;
+            return 1;
+        }
+    }
+    catch (std::exception) {
+        std::cout << "exception was thrown in lvl3MvTest2" << std::endl;
+        return 1;
+    }
+    return 0;
+}
+
+void construct3(FileSystem &sys){
+    MkfileCommand mk1("/f1");
+    MkfileCommand mk2("/f3");
+    MkdirCommand mkD2("/dir1/dir2");
+}
+
+int levelThreeTests(FileSystem &sys) {
+    int counter=0;
+    construct(sys);
+    counter+=lvl3MkDirTest1(sys);
+    counter+=lvl3MkFileTest1(sys);
+    counter+=lvl3lsTest1(sys);
+    counter+=lvl3MvTest1(sys);
+    counter+=lvl3RmTest1(sys);
+    counter+=lvl3RmTest2(sys);
+    counter+=lvl3CpTest1(sys);
+    counter+=lvl3MvTest2(sys);
+    return counter;
+}
+
+/***********************************************************
+ * main  *
+ ************************************************************/
+
+
 int main(int, char **) {
+    std::cout<<"*************Level 1****************"<<std::endl;
     int red1=0;
     FileSystem *sys1 = new FileSystem();
     red1 += rootTests(*sys1);
-    std::cout << "root level: red: " << red1 << " green: " << 11 - red1 << std::endl;
+    std::cout<<"************* END Level 1****************"<<std::endl;
+    std::cout << "root level: red: " << red1 << " green: " << 13 - red1 << std::endl;
+    std::cout<<"*************END Level 1****************\n"<<std::endl;
     delete sys1;
+    std::cout<<"*************Level 2****************"<<std::endl;
     int red2 = 0;
     FileSystem *sys2 = new FileSystem();
     red2 += levelTwoTests(*sys2);
+    std::cout<<"\n*************END Level 2****************"<<std::endl;
     std::cout << "level 2: red: " << red2 << " green: " << 15 - red2 << std::endl;
-
+    std::cout<<"*************END Level 2****************\n"<<std::endl;
+    delete sys2;
+    std::cout<<"*************Level 3****************"<<std::endl;
+    int red3=0;
+    FileSystem *sys3 = new FileSystem();
+    red3+=levelThreeTests(*sys3);
+    std::cout<<"\n************* END Level 3***************"<<std::endl;
+    std::cout << "level 3: red: " << red3 << " green: " << 7 - red3 << std::endl;
+    std::cout<<"************* END Level 3***************"<<std::endl;
 
 }
 
