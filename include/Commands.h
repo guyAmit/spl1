@@ -10,8 +10,6 @@ class BaseCommand {
 private:
     string args;
 public:
-//todo::delete msg and change the public methods to protected
-    string msg;
     /**
  *
  * @param path - the path to split
@@ -54,6 +52,7 @@ public:
     virtual void execute(FileSystem &fs) = 0;
 
     virtual string toString() = 0;
+    virtual ~BaseCommand()=0;
 
 };
 
@@ -65,6 +64,7 @@ public:
     void execute(FileSystem &fs); // Every derived class should implement this function according to the document (pdf)
     //print the working directory from the instance of file system
     virtual string toString();
+    virtual ~PwdCommand();
 };
 
 //Todo:: implement a function get BaseFile by Path. the function will be used in a the commands
@@ -77,6 +77,8 @@ public:
     void execute(FileSystem &fs);
 
     string toString();
+
+    virtual ~CdCommand();
 };
 
 
@@ -92,6 +94,8 @@ public:
 
     string toString();
 
+    virtual ~LsCommand();
+
 };
 
 
@@ -105,6 +109,8 @@ public:
     void execute(FileSystem &fs);
 
     string toString();
+
+    virtual ~MkdirCommand();
 };
 
 class MkfileCommand : public BaseCommand {
@@ -117,9 +123,10 @@ public:
     void execute(FileSystem &fs);
 
     string toString();
+
+    virtual ~MkfileCommand();
 };
 
-//check currect defintion in office hours
 class CpCommand : public BaseCommand {
 private:
 public:
@@ -128,6 +135,8 @@ public:
     void execute(FileSystem &fs);
 
     string toString();
+
+    virtual ~CpCommand();
 
     void addcopyFile(BaseFile *sourceFile, BaseFile *destDirectory) ;
 };
@@ -141,6 +150,8 @@ public:
     void execute(FileSystem &fs);
 
     string toString();
+
+    virtual ~MvCommand();
 };
 
 //find and remove
@@ -152,6 +163,8 @@ public:
     void execute(FileSystem &fs);
 
     string toString();
+
+    virtual ~RenameCommand();
 };
 
 //find and delete
@@ -163,6 +176,8 @@ public:
     void execute(FileSystem &fs);
 
     string toString();
+
+    virtual ~RmCommand();
 };
 
 class HistoryCommand : public BaseCommand {
@@ -174,6 +189,8 @@ public:
     void execute(FileSystem &fs);
 
     string toString();
+
+    virtual ~HistoryCommand();
 };
 
 
@@ -185,6 +202,8 @@ public:
     void execute(FileSystem &fs);
 
     string toString();
+
+    virtual ~VerboseCommand();
 };
 
 class ErrorCommand : public BaseCommand {
@@ -195,6 +214,8 @@ public:
     void execute(FileSystem &fs);
 
     string toString();
+
+    virtual ~ErrorCommand();
 };
 
 class ExecCommand : public BaseCommand {
@@ -206,6 +227,8 @@ public:
     void execute(FileSystem &fs);
 
     string toString();
+
+    virtual ~ExecCommand();
 };
 
 

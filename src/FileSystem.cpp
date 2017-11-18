@@ -2,14 +2,12 @@
 // Created by Guy-Amit on 11/8/2017.
 //
 
-#include "FileSystem.h"
+#include "../include/FileSystem.h"
 #include "string"
 
 using namespace std;
 
-FileSystem::FileSystem() {
-    this->rootDirectory=new Directory("/", nullptr);
-    this->workingDirectory=rootDirectory;
+FileSystem::FileSystem():rootDirectory(new Directory("/", nullptr)),workingDirectory(rootDirectory) {
 }
 
 Directory& FileSystem::getRootDirectory() const {

@@ -2,7 +2,7 @@
 // Created by Guy-Amit on 11/8/2017.
 //
 
-#include "Files.h"
+#include "../include/Files.h"
 
 //BaseFile class
 BaseFile::BaseFile(string name) : name("default") {
@@ -38,10 +38,7 @@ bool File::getType() { return false; }
 
 
 //Directory class
-Directory::Directory(string name, Directory *parent) : BaseFile(name) {
-    this->parent = parent;
-    this->children;
-
+Directory::Directory(string name, Directory *parent) : BaseFile(name) ,parent(parent),children(){
 }
 
 Directory *Directory::getParent() const {
