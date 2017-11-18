@@ -800,7 +800,8 @@ int lvl3lsTest1(FileSystem &sys) {
     LsCommand ls("-s /");
     try {
         ls.execute(sys);
-        if (ls.msg.substr(0,60)!="DIR\tdir1\t150\nFILE\tf1\t100\nFILE\tf3\t100\nDIR\tdir3\t0\n" ) {
+        if (ls.msg!="DIR\tdir3\t0\nFILE\tf1\t100\nFILE\tf3\t100\nDIR\tdir1\t150\n" &&
+                ls.msg!="DIR\tdir3\t0\nFILE\tf3\t100\nFILE\tf1\t100\nDIR\tdir1\t150\n" ) {
             std::cout << "something want wrong on lvl3lsTest1" << std::endl;
             return 1;
         }
