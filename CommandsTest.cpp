@@ -770,7 +770,7 @@ int lvl3MkDirTest1(FileSystem &sys) {
  * @return 1->test field 0->good
  */
 int lvl3MkFileTest1(FileSystem &sys) {
-    MkdirCommand mk("/dir1/dir2/f2 150");
+    MkfileCommand mk("/dir1/dir2/f2 150");
     CdCommand cd1("/dir1/dir2");
     CdCommand cd2("..");
     try {
@@ -957,14 +957,17 @@ int lvl3MvTest2(FileSystem &sys) {
 }
 
 void construct3(FileSystem &sys){
-    MkfileCommand mk1("/f1");
-    MkfileCommand mk2("/f3");
+    MkfileCommand mk1("/f1 100");
+    mk1.execute(sys);
+    MkfileCommand mk2("/f3 100");
+    mk2.execute(sys);
     MkdirCommand mkD2("/dir1/dir2");
+    mkD2.execute(sys);
 }
 
 int levelThreeTests(FileSystem &sys) {
     int counter=0;
-    construct(sys);
+    construct3(sys);
     counter+=lvl3MkDirTest1(sys);
     counter+=lvl3MkFileTest1(sys);
     counter+=lvl3lsTest1(sys);
