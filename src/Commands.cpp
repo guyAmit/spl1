@@ -102,6 +102,10 @@ bool BaseCommand::checkParents(BaseFile *basefile, FileSystem &fs) {
 
 PwdCommand::PwdCommand(string args) : BaseCommand(args) {}
 
+BaseCommand* PwdCommand::copy() {
+       return new PwdCommand(this->getArgs());
+}
+
 void PwdCommand::execute(FileSystem &fs) {
     cout << fs.getWorkingDirectory().getAbsolutePath() << endl;
 }
@@ -117,6 +121,11 @@ PwdCommand::~PwdCommand() {
 CdCommand::CdCommand(string args) : BaseCommand(args) {
 
 }
+
+BaseCommand* CdCommand::copy() {
+    return new CdCommand(this->getArgs());
+}
+
 
 void CdCommand::cd(string &path, Directory *current, FileSystem &fs) {
     if (!current) {
@@ -160,6 +169,11 @@ CdCommand::~CdCommand() {
 }
 
 LsCommand::LsCommand(string args) : BaseCommand(args) {}
+
+BaseCommand* LsCommand::copy() {
+    return new LsCommand(this->getArgs());
+}
+
 
 void LsCommand::execute(FileSystem &fs) {
     pair<string, string> args = getTwoPaths();
@@ -224,6 +238,11 @@ MkdirCommand::MkdirCommand(string args) : BaseCommand(args) {
 
 }
 
+BaseCommand* MkdirCommand::copy() {
+    return new MkdirCommand(this->getArgs());
+}
+
+
 void MkdirCommand::execute(FileSystem &fs) {
     string path = getArgs();
     mkdir(path, &fs.getWorkingDirectory(), fs);
@@ -276,6 +295,11 @@ MkdirCommand::~MkdirCommand() {
 
 MkfileCommand::MkfileCommand(string args) : BaseCommand(args) {
 }
+
+BaseCommand* MkfileCommand::copy() {
+    return new MkfileCommand(this->getArgs());
+}
+
 
 void MkfileCommand::execute(FileSystem &fs) {
     string args = getArgs();//split the size and the path
@@ -341,6 +365,11 @@ CpCommand::CpCommand(string args) : BaseCommand(args) {
 
 }
 
+BaseCommand* CpCommand::copy() {
+    return new CpCommand(this->getArgs());
+}
+
+
 void CpCommand::execute(FileSystem &fs) {
     pair<string, string> paths = getTwoPaths();
     string source = paths.first;
@@ -376,6 +405,11 @@ CpCommand::~CpCommand() {
 MvCommand::MvCommand(string args) : BaseCommand(args) {
 
 }
+
+BaseCommand* MvCommand::copy() {
+    return new MvCommand(this->getArgs());
+}
+
 
 void MvCommand::execute(FileSystem &fs) {
     pair<string, string> paths = getTwoPaths();
@@ -422,6 +456,11 @@ MvCommand::~MvCommand() {
 
 RenameCommand::RenameCommand(string args) : BaseCommand(args) {}
 
+BaseCommand* RenameCommand::copy() {
+    return new RenameCommand(this->getArgs());
+}
+
+
 void RenameCommand::execute(FileSystem &fs) {
     pair<string, string> paths = getTwoPaths();
     string source = paths.first;
@@ -457,8 +496,10 @@ RenameCommand::~RenameCommand() {
 
 }
 
-RmCommand::RmCommand(string args) : BaseCommand(args) {
+RmCommand::RmCommand(string args) : BaseCommand(args) {}
 
+BaseCommand* RmCommand::copy() {
+    return new RmCommand(this->getArgs());
 }
 
 void RmCommand::execute(FileSystem &fs) {
@@ -503,6 +544,11 @@ HistoryCommand::HistoryCommand(string args, const vector<BaseCommand *> &history
                                                                                     history(history) {
 }
 
+BaseCommand* HistoryCommand::copy() {
+    return new HistoryCommand(this->getArgs(),this->history);
+}
+
+
 void HistoryCommand::execute(FileSystem &fs) {
     int i = 0;
     while (i < static_cast<int>(history.size())) {
@@ -529,6 +575,11 @@ VerboseCommand::VerboseCommand(string args) : BaseCommand(args) {
 
 }
 
+BaseCommand* VerboseCommand::copy() {
+    return new VerboseCommand(this->getArgs());
+}
+
+
 void VerboseCommand::execute(FileSystem &fs) {
     int newVerbose = std::stoi(getArgs());
     if (newVerbose != 0 && newVerbose != 1 && newVerbose != 2 && newVerbose != 3) {
@@ -550,10 +601,17 @@ ErrorCommand::ErrorCommand(string args) : BaseCommand(args) {
 
 }
 
+BaseCommand* ErrorCommand::copy() {
+    return new ErrorCommand(this->getArgs());
+}
+
+
 //todo:: assuming the commands name is the args
 void ErrorCommand::execute(FileSystem &fs) {
     cout << getArgs() << ": Unknown command" << endl;
 }
+
+
 
 string ErrorCommand::toString() {
     return getArgs();
@@ -565,6 +623,10 @@ ErrorCommand::~ErrorCommand() {
 
 ExecCommand::ExecCommand(string args, const vector<BaseCommand *> &history) : BaseCommand(args), history(history) {
 
+}
+
+BaseCommand* ExecCommand::copy() {
+    return new ExecCommand(this->getArgs(),this->history);
 }
 
 void ExecCommand::execute(FileSystem &fs) {

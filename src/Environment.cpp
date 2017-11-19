@@ -151,7 +151,7 @@ void Environment::clean() {
 void Environment::copy(const Environment &rhs) {
     this->fs = rhs.fs;
     for (auto command :rhs.commandsHistory) {
-        this->commandsHistory.push_back(command);
+        this->commandsHistory.push_back(command->copy());
     }
 }
 
