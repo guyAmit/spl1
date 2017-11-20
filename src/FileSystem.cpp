@@ -47,14 +47,14 @@ void FileSystem::steal(FileSystem &rhs) {
     rhs.rootDirectory= nullptr;
 }
 
-FileSystem::FileSystem(const FileSystem &rhs) {
+FileSystem::FileSystem(const FileSystem &rhs):rootDirectory(nullptr),workingDirectory(nullptr) {
     if(verbose==1 ||verbose==3){
         cout << "FileSystem::FileSystem(const FileSystem &rhs)" << endl;
     }
     copy(rhs);
 }
 
-FileSystem::FileSystem(FileSystem &&rhs) {
+FileSystem::FileSystem(FileSystem &&rhs) :rootDirectory(nullptr),workingDirectory(nullptr){
     if(verbose==1 ||verbose==3){
         cout << "FileSystem::FileSystem(FileSystem &&rhs)" << endl;
     }

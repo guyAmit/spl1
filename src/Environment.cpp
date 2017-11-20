@@ -4,7 +4,7 @@
 
 #include "../include/Environment.h"
 
-Environment::Environment(): commandsHistory(),fs(){
+Environment::Environment() : commandsHistory(), fs() {
 }
 
 void Environment::start() {
@@ -22,7 +22,7 @@ void Environment::start() {
             if (verbose == 2 || verbose == 3) {
                 cout << line << endl;
             }
-            createCommand(inputStrings);
+            createCommand(inputStrings, line);
         }
         cout << fs.getWorkingDirectory().getAbsolutePath() << '>';
         inputStrings.clear();
@@ -35,7 +35,7 @@ void Environment::start() {
 }
 
 
-void Environment::createCommand(vector<string> inputStrings) {
+void Environment::createCommand(vector<string> inputStrings, string line) {
     string x = inputStrings[0];
     string y = "";
     string z = "";
@@ -46,7 +46,11 @@ void Environment::createCommand(vector<string> inputStrings) {
         z = inputStrings[2];
     }
     if (x == "ls") {
-        string args = y + ' ' + z;
+        string args;
+        if (z.empty())
+            args = y;
+        else
+            args = y + ' ' + z;
         LsCommand *ls = new LsCommand(args);
         ls->execute(fs);
         addToHistory(ls);
@@ -121,7 +125,7 @@ void Environment::createCommand(vector<string> inputStrings) {
         addToHistory(exec);
         return;
     }
-    ErrorCommand *error = new ErrorCommand(x);
+    ErrorCommand *error = new ErrorCommand(line);
     error->execute(fs);
     addToHistory(error);
 
@@ -169,7 +173,7 @@ Environment::~Environment() {
 
 }
 
-Environment::Environment(const Environment &rhs) {
+Environment::Environment(const Environment &rhs):commandsHistory() ,fs(){
     if (verbose == 1 || verbose == 3) {
         cout << "Environment::Environment(const Environment &rhs)" << endl;
     }
@@ -196,7 +200,7 @@ Environment &Environment::operator=(Environment &&rhs) {
     return *this;
 }
 
-Environment::Environment(Environment &&rhs) {
+Environment::Environment(Environment &&rhs):commandsHistory(),fs() {
     if (verbose == 1 || verbose == 3) {
         cout << "Environment::Environment(Environment &&rhs)" << endl;
     }

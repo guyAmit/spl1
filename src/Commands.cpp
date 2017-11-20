@@ -26,6 +26,7 @@ pair<string, string> BaseCommand::getsplittedPath(string path) {
 string BaseCommand::getArgs() {
     return args;
 }
+
 BaseCommand::~BaseCommand() {
 
 }
@@ -35,7 +36,7 @@ BaseFile *BaseCommand::getBaseFileByPath(string path, Directory *current, FileSy
         return nullptr;
     }
     if (path.empty()) {
-        return nullptr;
+        return current;
     }
     pair<string, string> splittedPair = getsplittedPath(path);
     string splittedPath = splittedPair.first;
@@ -66,12 +67,17 @@ pair<string, string> BaseCommand::splitArgs(string args) {
 pair<string, string> BaseCommand::getTwoPaths() {
     pair<string, string> pair;
     string args = getArgs();
-    size_t pos = args.find(' ');
-    string path1 = args.substr(0, pos);
-    args.erase(0, pos + 1);
-    string path2 = args;
-    pair.first = path1;
-    pair.second = path2;
+    size_t pos= args.find(' ');
+    if(pos !=string::npos) {
+        string path1 = args.substr(0, pos);
+        args.erase(0, pos + 1);
+        string path2 = args;
+        pair.first = path1;
+        pair.second = path2;
+    } else {
+        pair.first = args;
+        pair.second = "";
+    }
     return pair;
 }
 
@@ -102,8 +108,8 @@ bool BaseCommand::checkParents(BaseFile *basefile, FileSystem &fs) {
 
 PwdCommand::PwdCommand(string args) : BaseCommand(args) {}
 
-BaseCommand* PwdCommand::copy() {
-       return new PwdCommand(this->getArgs());
+BaseCommand *PwdCommand::copy() {
+    return new PwdCommand(this->getArgs());
 }
 
 void PwdCommand::execute(FileSystem &fs) {
@@ -122,7 +128,7 @@ CdCommand::CdCommand(string args) : BaseCommand(args) {
 
 }
 
-BaseCommand* CdCommand::copy() {
+BaseCommand *CdCommand::copy() {
     return new CdCommand(this->getArgs());
 }
 
@@ -170,7 +176,7 @@ CdCommand::~CdCommand() {
 
 LsCommand::LsCommand(string args) : BaseCommand(args) {}
 
-BaseCommand* LsCommand::copy() {
+BaseCommand *LsCommand::copy() {
     return new LsCommand(this->getArgs());
 }
 
@@ -180,40 +186,24 @@ void LsCommand::execute(FileSystem &fs) {
     if (args.first == "-s")
         ls(args.second, &fs.getWorkingDirectory(), fs, true);
     else
-        ls(args.first, &fs.getWorkingDirectory(), fs, false);
+        ls(getArgs(), &fs.getWorkingDirectory(), fs, false);
 }
 
 void LsCommand::ls(string path, Directory *current, FileSystem &fs, bool sortType) {
-    if (!current) {
-        cout << "The system cannot find the path specified" << endl;
-        return;
-    }
-    if (path.empty()) {
-        if (sortType)
-            current->sortBySize();
-        else
-            current->sortByName();
-        for (auto basefile: current->getChildren())
-            print(*basefile);
-        return;
-    }
-    pair<string, string> splittedPair = getsplittedPath(path);
-    string splittedPath = splittedPair.first;
-    path = splittedPair.second;
-    if (splittedPath.empty()) {
-        ls(path, &fs.getRootDirectory(), fs, sortType);
-        return;
-    }
-    if (splittedPath == "..") {
-        ls(path, current->getParent(), fs, sortType);
-        return;
-    }
-    BaseFile *basefile = current->getBaseFileByName(splittedPath);
+    BaseFile *basefile = getBaseFileByPath(path, current, fs);
     if (basefile && basefile->getType()) {
-        ls(path, dynamic_cast<Directory *>(basefile), fs, sortType);
+        Directory *dir = dynamic_cast<Directory *>(basefile);
+        if (sortType)
+            dir->sortBySize();
+        else
+            dir->sortByName();
+        for (auto file: dir->getChildren())
+            print(*file);
+        return;
     } else {
         cout << "The system cannot find the path specified" << endl;
     }
+
 }
 
 void LsCommand::print(BaseFile &pFile) {
@@ -238,7 +228,7 @@ MkdirCommand::MkdirCommand(string args) : BaseCommand(args) {
 
 }
 
-BaseCommand* MkdirCommand::copy() {
+BaseCommand *MkdirCommand::copy() {
     return new MkdirCommand(this->getArgs());
 }
 
@@ -280,7 +270,7 @@ void MkdirCommand::mkdir(string path, Directory *current, FileSystem &fs) {
             cout << "The directory already exists" << endl;
         }
 
-    }else {
+    } else {
         cout << "The directory already exists" << endl;
     }
 }
@@ -296,7 +286,7 @@ MkdirCommand::~MkdirCommand() {
 MkfileCommand::MkfileCommand(string args) : BaseCommand(args) {
 }
 
-BaseCommand* MkfileCommand::copy() {
+BaseCommand *MkfileCommand::copy() {
     return new MkfileCommand(this->getArgs());
 }
 
@@ -365,7 +355,7 @@ CpCommand::CpCommand(string args) : BaseCommand(args) {
 
 }
 
-BaseCommand* CpCommand::copy() {
+BaseCommand *CpCommand::copy() {
     return new CpCommand(this->getArgs());
 }
 
@@ -406,7 +396,7 @@ MvCommand::MvCommand(string args) : BaseCommand(args) {
 
 }
 
-BaseCommand* MvCommand::copy() {
+BaseCommand *MvCommand::copy() {
     return new MvCommand(this->getArgs());
 }
 
@@ -456,7 +446,7 @@ MvCommand::~MvCommand() {
 
 RenameCommand::RenameCommand(string args) : BaseCommand(args) {}
 
-BaseCommand* RenameCommand::copy() {
+BaseCommand *RenameCommand::copy() {
     return new RenameCommand(this->getArgs());
 }
 
@@ -498,7 +488,7 @@ RenameCommand::~RenameCommand() {
 
 RmCommand::RmCommand(string args) : BaseCommand(args) {}
 
-BaseCommand* RmCommand::copy() {
+BaseCommand *RmCommand::copy() {
     return new RmCommand(this->getArgs());
 }
 
@@ -515,7 +505,7 @@ void RmCommand::execute(FileSystem &fs) {
         else
             sourceDir = getBaseFileByPath(sourceDirStr, &fs.getWorkingDirectory(), fs);
     }
-    if(sourceDirStr=="/"&&path=="/") {
+    if (sourceDirStr == "/" && path == "/") {
         cout << "Can't remove directory" << endl;
         return;
     }
@@ -544,17 +534,16 @@ HistoryCommand::HistoryCommand(string args, const vector<BaseCommand *> &history
                                                                                     history(history) {
 }
 
-BaseCommand* HistoryCommand::copy() {
-    return new HistoryCommand(this->getArgs(),this->history);
+BaseCommand *HistoryCommand::copy() {
+    return new HistoryCommand(this->getArgs(), this->history);
 }
 
 
 void HistoryCommand::execute(FileSystem &fs) {
     int i = 0;
     while (i < static_cast<int>(history.size())) {
-        if (history[i]->getArgs().find(' ') != string::npos) {
-            pair<string, string> args = splitArgs(history[i]->getArgs());
-            cout << i << "\t" << history[i]->toString() << " " << args.first << " " << args.second << endl;
+        if (dynamic_cast<ErrorCommand *>(history[i])) {
+            cout << i << "\t" << history[i]->toString() << endl;
         } else {
             cout << i << "\t" << history[i]->toString() << " " << history[i]->getArgs() << endl;
 
@@ -575,7 +564,7 @@ VerboseCommand::VerboseCommand(string args) : BaseCommand(args) {
 
 }
 
-BaseCommand* VerboseCommand::copy() {
+BaseCommand *VerboseCommand::copy() {
     return new VerboseCommand(this->getArgs());
 }
 
@@ -601,16 +590,22 @@ ErrorCommand::ErrorCommand(string args) : BaseCommand(args) {
 
 }
 
-BaseCommand* ErrorCommand::copy() {
+BaseCommand *ErrorCommand::copy() {
     return new ErrorCommand(this->getArgs());
 }
 
 
 //todo:: assuming the commands name is the args
 void ErrorCommand::execute(FileSystem &fs) {
-    cout << getArgs() << ": Unknown command" << endl;
-}
+    string args = getArgs();
+    size_t pos = args.find(' ');
+    if ((pos != string::npos)) {
+        cout << args.substr(0, pos) << ": Unknown command" << endl;
+    } else {
+        cout << args << ": Unknown command" << endl;
 
+    }
+}
 
 
 string ErrorCommand::toString() {
@@ -625,8 +620,8 @@ ExecCommand::ExecCommand(string args, const vector<BaseCommand *> &history) : Ba
 
 }
 
-BaseCommand* ExecCommand::copy() {
-    return new ExecCommand(this->getArgs(),this->history);
+BaseCommand *ExecCommand::copy() {
+    return new ExecCommand(this->getArgs(), this->history);
 }
 
 void ExecCommand::execute(FileSystem &fs) {

@@ -38,7 +38,7 @@ bool File::getType() { return false; }
 
 
 //Directory class
-Directory::Directory(string name, Directory *parent) : BaseFile(name) ,parent(parent),children(){
+Directory::Directory(string name, Directory *parent) : BaseFile(name) ,children(),parent(parent){
 }
 
 Directory *Directory::getParent() const {
@@ -70,7 +70,7 @@ void Directory::addFile(BaseFile *file) {
     clean();
 }
 
-Directory::Directory(const Directory &rhs) : BaseFile("default") {
+Directory::Directory(const Directory &rhs) : BaseFile("default"),children(),parent(nullptr) {
     if(verbose==1 ||verbose==3){
         cout << "Directory::Directory(const Directory &rhs)" << endl;
     }
@@ -89,7 +89,7 @@ Directory &Directory::operator=(const Directory &rhs) {
     return *this;
 }
 
-Directory::Directory(Directory &&rhs) : BaseFile("default") {
+Directory::Directory(Directory &&rhs) : BaseFile("default"),children(),parent(nullptr) {
     if(verbose==1 ||verbose==3){
         cout << "Directory::Directory(Directory &&rhs)" << endl;
     }
@@ -114,7 +114,6 @@ void Directory::steal(Directory &rhs) {
 
 void Directory::copy(const Directory &rhs) {
     this->setName(rhs.getName());
-    this->children;
     for (auto baseFile:rhs.children) {
         if (!baseFile->getType())
             children.push_back(new File(baseFile->getName(), baseFile->getSize()));

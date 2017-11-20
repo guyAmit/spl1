@@ -19,15 +19,15 @@ public:
 
     BaseFile *getBaseFileByPath(string path,Directory* current,FileSystem &fs);
     /**
-     * splits the args field (string) into two strings by '$'.
+     * splits the args field (string) into two strings by ' '.
      *
-     * @return  two strings- the first is the string before '$'. the second- the string after '$'.
+     * @return  two strings- the first is the string before ' '. the second- the string after ' '.
      */
    pair <string, string> getTwoPaths();
     /**
      * splits the args (string) into two strings by '$'.
      *@param args -the string to split
-     * @return  two strings- the first is the string before '$'. the second- the string after '$'.
+     * @return  two strings- the first is the string before ' '. the second- the string after ' '.
      */
     pair<string, string> splitArgs(string args);
     /**
@@ -54,6 +54,8 @@ public:
     virtual string toString() = 0;
     virtual ~BaseCommand()=0;
 
+    virtual BaseCommand *copy()=0;
+
 };
 
 class PwdCommand : public BaseCommand {
@@ -65,6 +67,8 @@ public:
     //print the working directory from the instance of file system
     virtual string toString();
     virtual ~PwdCommand();
+
+    BaseCommand *copy();
 };
 
 //Todo:: implement a function get BaseFile by Path. the function will be used in a the commands
@@ -79,6 +83,8 @@ public:
     string toString();
 
     virtual ~CdCommand();
+
+    BaseCommand *copy();
 };
 
 
@@ -96,6 +102,7 @@ public:
 
     virtual ~LsCommand();
 
+    BaseCommand *copy();
 };
 
 
@@ -111,6 +118,8 @@ public:
     string toString();
 
     virtual ~MkdirCommand();
+
+    BaseCommand *copy();
 };
 
 class MkfileCommand : public BaseCommand {
@@ -125,6 +134,8 @@ public:
     string toString();
 
     virtual ~MkfileCommand();
+
+    BaseCommand *copy();
 };
 
 class CpCommand : public BaseCommand {
@@ -139,6 +150,8 @@ public:
     virtual ~CpCommand();
 
     void addcopyFile(BaseFile *sourceFile, BaseFile *destDirectory) ;
+
+    BaseCommand *copy();
 };
 
 
@@ -152,6 +165,8 @@ public:
     string toString();
 
     virtual ~MvCommand();
+
+    BaseCommand *copy();
 };
 
 //find and remove
@@ -165,6 +180,8 @@ public:
     string toString();
 
     virtual ~RenameCommand();
+
+    BaseCommand *copy();
 };
 
 //find and delete
@@ -178,6 +195,8 @@ public:
     string toString();
 
     virtual ~RmCommand();
+
+    BaseCommand *copy();
 };
 
 class HistoryCommand : public BaseCommand {
@@ -191,6 +210,8 @@ public:
     string toString();
 
     virtual ~HistoryCommand();
+
+    BaseCommand *copy();
 };
 
 
@@ -204,6 +225,8 @@ public:
     string toString();
 
     virtual ~VerboseCommand();
+
+    BaseCommand *copy();
 };
 
 class ErrorCommand : public BaseCommand {
@@ -216,6 +239,8 @@ public:
     string toString();
 
     virtual ~ErrorCommand();
+
+    BaseCommand *copy();
 };
 
 class ExecCommand : public BaseCommand {
@@ -229,6 +254,8 @@ public:
     string toString();
 
     virtual ~ExecCommand();
+
+    BaseCommand *copy();
 };
 
 

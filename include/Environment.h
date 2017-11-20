@@ -24,7 +24,7 @@ public:
     FileSystem& getFileSystem() ; // Get a reference to the file system
     void addToHistory(BaseCommand *command); // Add a new command to the history
     const vector<BaseCommand*>& getHistory() const; // Return a reference to the history of commands
-    void createCommand(vector<string> inputStrings) ;
+    void createCommand(vector<string> inputStrings,string line) ;
     //rule of 5 methods
     Environment &operator=(const Environment  &rhs);
     Environment &operator=(Environment &&rhs);
