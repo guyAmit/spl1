@@ -2,7 +2,7 @@
 // Created by Guy-Amit on 11/8/2017.
 //
 
-#include "../include/Files.h"
+#include "Files.h"
 
 //BaseFile class
 BaseFile::BaseFile(string name) : name("default") {
@@ -33,8 +33,8 @@ int File::getSize() { return size; }
 
 bool File::getType() { return false; }
 
- File::~File() {
- }
+File::~File() {
+}
 
 
 //Directory class
@@ -63,7 +63,7 @@ void Directory::addFile(BaseFile *file) {
 }
 
 //rule of 5
- Directory::~Directory() {
+Directory::~Directory() {
     if(verbose==1 ||verbose==3){
         cout << "Directory::~Directory()" << endl;
     }
@@ -202,7 +202,7 @@ BaseFile *Directory::getBaseFileByName(string name) {
 void Directory::eraseByName(string name){
     auto it = searchFileName(name);
     if(it != children.end())
-    children.erase(it);
+        children.erase(it);
 }
 
 

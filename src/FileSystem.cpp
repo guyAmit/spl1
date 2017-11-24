@@ -2,8 +2,9 @@
 // Created by Guy-Amit on 11/8/2017.
 //
 
-#include "../include/FileSystem.h"
+#include "FileSystem.h"
 #include "string"
+#include"Commands.h"
 
 using namespace std;
 
@@ -24,6 +25,7 @@ void FileSystem::setWorkingDirectory(Directory *newWorkingDirectory) {
     }
     else{throw std::exception();}
 }
+
 /************************************************
 implemention of rule of 5
  there should be only one file system.
@@ -35,8 +37,9 @@ void FileSystem::clean()  {
 }
 
 void FileSystem::copy(const FileSystem &rhs) {
-    this->rootDirectory=rhs.rootDirectory;
-    this->workingDirectory=rhs.workingDirectory;
+    string path=rhs.workingDirectory->getAbsolutePath();
+    this->rootDirectory=new Directory(*rhs.rootDirectory);
+    CdCommand::cd(path,rootDirectory,*this);
 
 }
 
@@ -71,8 +74,8 @@ FileSystem& FileSystem::operator=(FileSystem &&rhs) {
     if(verbose==1 ||verbose==3){
         cout << "FileSystem& FileSystem::operator=(FileSystem &&rhs)" << endl;
     }
-        clean();
-        steal(rhs);
+    clean();
+    steal(rhs);
     return *this;
 }
 

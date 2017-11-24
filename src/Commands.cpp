@@ -2,7 +2,7 @@
 // Created by Guy-Amit on 11/8/2017.
 //
 
-#include "../include/Commands.h"
+#include "Commands.h"
 
 BaseCommand::BaseCommand(string args) : args(args) {}
 
@@ -367,20 +367,22 @@ void CpCommand::execute(FileSystem &fs) {
     BaseFile *sourceFile = getBaseFileByPath(source, &fs.getWorkingDirectory(), fs);
     BaseFile *destDirectory = getBaseFileByPath(destination, &fs.getWorkingDirectory(), fs);
     if (sourceFile && destDirectory && destDirectory->getType()) {
-        addcopyFile(sourceFile, destDirectory);
+        addcopyFile(sourceFile, dynamic_cast<Directory *>(destDirectory));
         return;
     }
     cout << "No such file or directory" << endl;
 }
 
-void CpCommand::addcopyFile(BaseFile *sourceFile, BaseFile *destDirectory) {
-    if (sourceFile->getType()) {
-        Directory *newDirectory = new Directory(*dynamic_cast<Directory *>(sourceFile));
-        newDirectory->setParent(dynamic_cast<Directory *>(destDirectory));
-        (dynamic_cast<Directory *>(destDirectory))->addFile(newDirectory);
-    } else {
-        (dynamic_cast<Directory *>(destDirectory))->addFile(new File(sourceFile->getName(), sourceFile->getSize()));
+void CpCommand::addcopyFile(BaseFile *sourceFile, Directory *destDirectory) {
+    if (!destDirectory->getBaseFileByName(sourceFile->getName())) {
+        if (sourceFile->getType()) {
+            Directory *newDirectory = new Directory(*dynamic_cast<Directory *>(sourceFile));
+            newDirectory->setParent(destDirectory);
+            destDirectory->addFile(newDirectory);
+        } else {
+            (dynamic_cast<Directory *>(destDirectory))->addFile(new File(sourceFile->getName(), sourceFile->getSize()));
 
+        }
     }
 }
 

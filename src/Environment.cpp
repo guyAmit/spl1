@@ -2,7 +2,7 @@
 // Created by Guy-Amit on 11/8/2017.
 //
 
-#include "../include/Environment.h"
+#include "Environment.h"
 
 Environment::Environment() : commandsHistory(), fs() {
 }
